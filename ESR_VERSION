@@ -1,0 +1,5 @@
+153.5.1esr
+tag: FIREFOX_153_5_1esr_RELEASE
+branch: esr153
+commit: 6cd88e7d45fe7a5b0b87b984fb32a8779151860e
+source: https://github.com/mozilla-firefox/firefox

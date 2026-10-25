@@ -1,0 +1,13 @@
+# Upstream Firefox ESR source checkout (fetched locally, never committed)
+engine/
+
+# Build output and logs
+obj-*/
+build-logs/
+*.log
+
+# Editor / OS clutter
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
