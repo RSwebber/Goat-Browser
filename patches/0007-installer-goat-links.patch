@@ -1,0 +1,26 @@
+diff --git a/browser/installer/windows/nsis/uninstaller.nsi b/browser/installer/windows/nsis/uninstaller.nsi
+index becbb0f70c..fb7bfbad53 100755
+--- a/browser/installer/windows/nsis/uninstaller.nsi
++++ b/browser/installer/windows/nsis/uninstaller.nsi
+@@ -150,7 +150,7 @@ OutFile "helper.exe"
+ !endif
+ ShowUnInstDetails nevershow
+ 
+-!define URLUninstallSurvey "https://qsurvey.mozilla.com/s3/FF-Desktop-Post-Uninstall?channel=${UpdateChannel}&version=${AppVersion}&osversion="
++!define URLUninstallSurvey "https://github.com/RSwebber/Goat-Browser/issues/new?title=Uninstall%20feedback&body=Windows%20"
+ 
+ ; Support for the profile refresh feature
+ !define URLProfileRefreshHelp "https://support.mozilla.org/kb/refresh-firefox-reset-add-ons-and-settings"
+diff --git a/browser/locales/en-US/installer/custom.properties b/browser/locales/en-US/installer/custom.properties
+index 8c33192e58..71719ac40f 100644
+--- a/browser/locales/en-US/installer/custom.properties
++++ b/browser/locales/en-US/installer/custom.properties
+@@ -73,7 +73,7 @@ STATUS_INSTALL_APP=Installing $BrandShortName…
+ STATUS_UNINSTALL_MAIN=Uninstalling $BrandShortName…
+ STATUS_CLEANUP=A Little Housekeeping…
+ 
+-UN_SURVEY_CHECKBOX_LABEL=Tell Mozilla why you uninstalled $BrandShortName
++UN_SURVEY_CHECKBOX_LABEL=Tell the $BrandShortName developers why you uninstalled (opens GitHub)
+ 
+ # _DESC strings support approximately 65 characters per line.
+ # One line

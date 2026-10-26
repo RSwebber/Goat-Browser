@@ -11,8 +11,8 @@
 !define BrandFullNameInternal "Goat Browser"
 !define BrandFullName         "Goat Browser"
 !define CompanyName           "Goat"
-!define URLInfoAbout          "https://www.mozilla.org"
-!define HelpLink              "https://support.mozilla.org"
+!define URLInfoAbout          "https://github.com/RSwebber/Goat-Browser"
+!define HelpLink              "https://github.com/RSwebber/Goat-Browser/issues"
 
 !define URLStubDownloadX86 "https://download.mozilla.org/?os=win&lang=${AB_CD}&product=firefox-latest"
 !define URLStubDownloadAMD64 "https://download.mozilla.org/?os=win64&lang=${AB_CD}&product=firefox-latest"
