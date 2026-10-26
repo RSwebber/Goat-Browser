@@ -1,0 +1,18 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# Staged by scripts/apply.sh as browser/branding/goat/distribution/.
+# Installs Goat's enterprise policies and bundled add-ons into
+# dist/bin/distribution/, which the installer's package-manifest already
+# ships (@RESPATH@/distribution/*).
+
+DIST_SUBDIR = ""
+
+FINAL_TARGET_FILES.distribution += [
+    "policies.json",
+]
+
+FINAL_TARGET_FILES.distribution.extensions += [
+    "extensions/uBlock0@raymondhill.net.xpi",
+]
