@@ -1,0 +1,62 @@
+# Weekly check for a new Firefox ESR release. Opens an issue when one is out.
+# No builds run in CI; updating is done locally with scripts/update-esr.sh.
+name: ESR check
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ESR_VERSION
+            scripts/check-esr.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Compare ESR_VERSION with Mozilla's latest ESR
+        id: esr
+        run: |
+          set +e
+          bash scripts/check-esr.sh
+          rc=$?
+          # 0 = up to date, 10 = update available, anything else = error
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 10 ]; then exit "$rc"; fi
+
+      - name: Open an issue if there isn't one already
+        if: steps.esr.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          CURRENT: ${{ steps.esr.outputs.current }}
+          LATEST: ${{ steps.esr.outputs.latest }}
+        run: |
+          title="New Firefox ESR available: $LATEST"
+          existing=$(gh issue list --state open --search "in:title \"$title\"" \
+            --json title --jq "map(select(.title == \"$title\")) | length")
+          if [ "$existing" -gt 0 ]; then
+            echo "An open issue already exists: $title"
+            exit 0
+          fi
+          gh issue create --title "$title" --body "$(cat <<EOF
+          Mozilla has released Firefox **$LATEST**. Goat is built on **$CURRENT** (see \`ESR_VERSION\`).
+
+          ESR point releases usually contain security fixes, so update soon:
+
+          \`\`\`bash
+          scripts/update-esr.sh $LATEST
+          \`\`\`
+
+          Then build, package and test the installer as described in the README
+          ("Updating to a new Firefox ESR"), and commit the new \`ESR_VERSION\`.
+
+          Release notes: https://www.mozilla.org/firefox/${LATEST}/releasenotes/
+          EOF
+          )"
