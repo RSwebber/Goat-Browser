@@ -1,0 +1,29 @@
+diff --git a/browser/components/protections/ContentBlockingPrefs.sys.mjs b/browser/components/protections/ContentBlockingPrefs.sys.mjs
+index 4b709b7476..2321208686 100644
+--- a/browser/components/protections/ContentBlockingPrefs.sys.mjs
++++ b/browser/components/protections/ContentBlockingPrefs.sys.mjs
+@@ -518,6 +518,24 @@ export let ContentBlockingPrefs = {
+ 
+   init() {
+     this.setPrefExpectationsAndUpdate();
++    // Goat: honour a non-standard built-in default category (e.g. "strict"
++    // from the branding prefs) on profiles where the user hasn't picked one,
++    // by applying that category's prefs as user values. matchCBCategory()
++    // below then reports it. Choosing another category in Settings stores a
++    // user value for the category pref, which skips this from then on.
++    if (
++      !Services.prefs.prefHasUserValue(this.PREF_CB_CATEGORY) &&
++      !Services.prefs.prefIsLocked(this.PREF_CB_CATEGORY)
++    ) {
++      let builtIn = Services.prefs
++        .getDefaultBranch(null)
++        .getStringPref(this.PREF_CB_CATEGORY, "standard");
++      if (builtIn in this.CATEGORY_PREFS && builtIn != "standard") {
++        this.switchingCategory = true;
++        this.setPrefsToCategory(builtIn, false, true);
++        this.switchingCategory = false;
++      }
++    }
+     this.matchCBCategory();
+ 
+     for (let prefix of PREF_PREFIXES_TO_OBSERVE) {

@@ -1,0 +1,17 @@
+# Goat Browser build configuration.
+# scripts/apply.sh points MOZCONFIG at this file.
+# Optimized, non-debug build (the defaults).
+
+ac_add_options --with-branding=browser/branding/goat
+ac_add_options --with-app-name=goat
+# The vendor ("Goat") can't be set here; patches/0001 sets it.
+
+# No update server yet.
+ac_add_options --disable-updater
+ac_add_options --disable-crashreporter
+ac_add_options --disable-default-browser-agent
+ac_add_options --enable-release
+
+# Same channel as official ESR builds. (Local "default"-channel builds lock
+# toolkit.telemetry.enabled=true.)
+ac_add_options --enable-update-channel=esr
