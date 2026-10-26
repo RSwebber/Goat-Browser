@@ -1,0 +1,61 @@
+{
+  "manifest_version": 2,
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "goat-light@goat-browser"
+    }
+  },
+
+  "name": "Goat Light",
+  "description": "White toolbars and black text, the light counterpart of Goat Dark.",
+  "author": "Goat Browser",
+  "version": "1.0.0",
+  "icons": { "32": "icon.svg" },
+
+  "theme": {
+    "properties": {
+      "color_scheme": "light",
+      "content_color_scheme": "system"
+    },
+    "colors": {
+      "frame": "#e4e4e4",
+      "frame_inactive": "#ececec",
+      "toolbar": "#ffffff",
+      "toolbar_text": "#111111",
+      "icons": "#111111",
+      "icons_attention": "#111111",
+      "button_background_hover": "rgba(0, 0, 0, 0.07)",
+      "button_background_active": "rgba(0, 0, 0, 0.14)",
+      "toolbar_field": "#f0f0f0",
+      "toolbar_field_text": "#111111",
+      "toolbar_field_focus": "#ffffff",
+      "toolbar_field_text_focus": "#111111",
+      "toolbar_field_border": "transparent",
+      "toolbar_field_border_focus": "#111111",
+      "toolbar_field_highlight": "rgba(0, 0, 0, 0.2)",
+      "toolbar_top_separator": "transparent",
+      "toolbar_bottom_separator": "#d4d4d4",
+      "toolbar_vertical_separator": "#cccccc",
+      "tab_selected": "#ffffff",
+      "tab_text": "#111111",
+      "tab_background_text": "#2b2b2b",
+      "tab_line": "#111111",
+      "tab_loading": "#111111",
+      "bookmark_text": "#111111",
+      "popup": "#ffffff",
+      "popup_text": "#111111",
+      "popup_border": "#d4d4d4",
+      "popup_highlight": "#e8e8e8",
+      "popup_highlight_text": "#111111",
+      "sidebar": "#f5f5f5",
+      "sidebar_text": "#111111",
+      "sidebar_border": "#d4d4d4",
+      "sidebar_highlight": "#e0e0e0",
+      "sidebar_highlight_text": "#111111",
+      "ntp_background": "#f7f7f7",
+      "ntp_text": "#111111",
+      "focus_outline": "#111111"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+diff --git a/browser/themes/BuiltInThemeConfig.sys.mjs b/browser/themes/BuiltInThemeConfig.sys.mjs
+index efe786548a..ef18eed17f 100644
+--- a/browser/themes/BuiltInThemeConfig.sys.mjs
++++ b/browser/themes/BuiltInThemeConfig.sys.mjs
+@@ -46,4 +46,19 @@ export const BuiltInThemeConfig = new Map([
+       path: "resource://builtin-themes/alpenglow/",
+     },
+   ],
++  // Goat themes, shipped in browser/branding/goat/content/themes/.
++  [
++    "goat-dark@goat-browser",
++    {
++      version: "1.0.0",
++      path: "resource://goat-themes/goat-dark/",
++    },
++  ],
++  [
++    "goat-light@goat-browser",
++    {
++      version: "1.0.0",
++      path: "resource://goat-themes/goat-light/",
++    },
++  ],
+ ]);
+diff --git a/browser/themes/BuiltInThemes.sys.mjs b/browser/themes/BuiltInThemes.sys.mjs
+index ffad3aa4c7..e708694335 100644
+--- a/browser/themes/BuiltInThemes.sys.mjs
++++ b/browser/themes/BuiltInThemes.sys.mjs
+@@ -11,6 +11,11 @@ ChromeUtils.defineESModuleGetters(lazy, {
+ 
+ const kActiveThemePref = "extensions.activeThemeID";
+ 
++// Goat: new profiles start with Goat Dark instead of the stock default theme.
++// This is applied once; afterwards the user's theme choice is left alone.
++const kGoatDefaultTheme = "goat-dark@goat-browser";
++const kGoatDefaultAppliedPref = "browser.goat.defaultThemeApplied";
++
+ class _BuiltInThemes {
+   /**
+    * The list of themes to be installed. This is exposed on the class so tests
+@@ -44,6 +49,22 @@ class _BuiltInThemes {
+     );
+     let activeBuiltInTheme = this.builtInThemeMap.get(activeThemeID);
+ 
++    if (!Services.prefs.getBoolPref(kGoatDefaultAppliedPref, false)) {
++      Services.prefs.setBoolPref(kGoatDefaultAppliedPref, true);
++      let goatTheme = this.builtInThemeMap.get(kGoatDefaultTheme);
++      if (activeThemeID == "default-theme@mozilla.org" && goatTheme) {
++        lazy.AddonManager.maybeInstallBuiltinAddon(
++          kGoatDefaultTheme,
++          goatTheme.version,
++          goatTheme.path
++        )
++          .then(() => lazy.AddonManager.getAddonByID(kGoatDefaultTheme))
++          .then(addon => addon?.enable())
++          .catch(console.error);
++        return;
++      }
++    }
++
+     if (activeBuiltInTheme) {
+       lazy.AddonManager.maybeInstallBuiltinAddon(
+         activeThemeID,
