@@ -4,8 +4,13 @@ Goat Browser is a privacy-, security- and customization-focused web browser
 built as a fork of **Firefox ESR**. The current base is Firefox
 **153.5.1esr** (see [`ESR_VERSION`](ESR_VERSION)).
 
-> Status: step 2. Goat branding, privacy defaults, enterprise policies and a
-> bundled uBlock Origin are applied on top of upstream Firefox ESR.
+> Status: step 3. Goat branding, privacy defaults, policies, a bundled uBlock
+> Origin, Goat themes and a Goat settings pane are applied on top of upstream
+> Firefox ESR.
+
+![Goat settings pane](docs/screenshots/goat-settings.png)
+
+![Goat Dark with vertical tabs](docs/screenshots/goat-dark-vertical-tabs.png)
 
 ## Layout
 
@@ -16,7 +21,10 @@ goat/
 │   ├── GOAT.png           original logo
 │   ├── goat-logo.png      transparent, square-cropped logo (generated)
 │   └── goat/              branding dir -> engine/browser/branding/goat
-│       └── pref/firefox-branding.js   built-in privacy defaults
+│       ├── pref/firefox-branding.js   built-in privacy defaults
+│       ├── content/goat-settings.mjs  the Goat settings pane
+│       ├── content/themes/            Goat Dark and Goat Light themes
+│       └── locales/en-US/goat.ftl     Goat UI strings
 ├── settings/
 │   ├── policies.json      enterprise policies -> dist/bin/distribution/
 │   ├── distribution/extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
@@ -26,6 +34,7 @@ goat/
 │   ├── apply.sh           stages the overlay onto engine/ and sets MOZCONFIG
 │   ├── make_branding.py   regenerates all branding images from GOAT.png
 │   └── setup.md           toolchain versions used
+├── docs/screenshots/      screenshots used in this README
 ├── mozconfig              build options
 ├── ESR_VERSION            exact upstream version, tag and commit we build on
 └── LICENSE                MPL-2.0
@@ -51,8 +60,26 @@ applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
   `about:config`.
 - **Policies** (`settings/policies.json`): DisableTelemetry,
   DisableFirefoxStudies, DisablePocket, DuckDuckGo as the default search
-  engine, and uBlock Origin installed as `normal_installed` (the user can
-  disable it, but it is reinstalled if removed).
+  engine, uBlock Origin installed as `normal_installed` (the user can
+  disable it, but it is reinstalled if removed), and UserMessaging to hide
+  the Firefox Labs and More from Mozilla settings pages.
+- **Goat settings pane** (`about:preferences#goat`): every control is bound
+  to a real pref, so everything is reversible in `about:config`.
+  - Appearance: theme (Goat Dark, Goat Light, or follow Windows), vertical
+    tabs, compact density, bookmarks toolbar.
+  - Privacy level: *Maximum* (`privacy.resistFingerprinting`, which forces
+    light mode and UTC times on websites) or *Balanced* (RFP off and
+    Firefox's fingerprinting protection, on via strict ETP, which keeps dark
+    mode and local time). Under Maximum, a list of exempt sites
+    (`privacy.resistFingerprinting.exemptedDomains`).
+  - Privacy: HTTPS-Only Mode, clear cookies and site data on close (same
+    semantics as Firefox's own checkbox; history is not cleared), and a button
+    for the uBlock Origin dashboard.
+  - Keyboard shortcuts: a link to Firefox's built-in editor, `about:keyboard`.
+- **Themes**: Goat Dark (the default on new profiles) and Goat Light are
+  built-in themes and appear in Add-ons → Themes.
+- **About dialog**: Goat's own text and project link instead of Mozilla's
+  donate and get-involved links, with credit to Firefox ESR by Mozilla.
 - **Patches** (`patches/`):
   - `0001-set-app-vendor-goat.patch`: sets the build vendor to "Goat" (this
     ESR doesn't allow it in a mozconfig). The Firefox app ID is kept, so
@@ -63,6 +90,22 @@ applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
     would be ignored. Users can still switch to Standard or Custom.
   - `0003-windows-company-name-goat.patch`: "Goat" instead of "Mozilla
     Corporation" in the Windows file properties of goat.exe.
+  - `0004-about-dialog-goat-credit.patch`: the About dialog text above.
+  - `0005-goat-settings-pane.patch`: registers the Goat settings pane and
+    its nav entry. The pane's code and strings live in `branding/goat`.
+  - `0006-goat-builtin-themes.patch`: registers Goat Dark and Goat Light as
+    built-in themes and switches new profiles to Goat Dark once. After that,
+    the user's theme choice is left alone.
+
+### Known leftovers
+
+- The profile folder is `%APPDATA%\Goat\Firefox`. Changing the internal app
+  basename (`--with-app-basename=Goat`) would also change the user-agent to
+  "Goat/…" unless more configure options were patched. That breaks
+  addons.mozilla.org installs and makes users more fingerprintable, and it
+  needs a near-full rebuild, so it is left as is.
+- The About dialog's "Terms of Use" and "Privacy Notice" links still point
+  to Mozilla's Firefox documents.
 
 ## Building on Windows
 
