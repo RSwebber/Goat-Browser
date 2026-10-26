@@ -1,3 +1,16 @@
+diff --git a/browser/installer/windows/nsis/shared.nsh b/browser/installer/windows/nsis/shared.nsh
+index b81c7ef59b..bede9ee427 100755
+--- a/browser/installer/windows/nsis/shared.nsh
++++ b/browser/installer/windows/nsis/shared.nsh
+@@ -701,7 +701,7 @@ FunctionEnd
+     ${WriteRegStr2} $RegHive "$0" "DisplayName" "${BrandFullNameInternal}$3 (${ARCH} ${AB_CD})" 0
+     ${WriteRegStr2} $RegHive "$0" "HelpLink" "${HelpLink}" 0
+     ${WriteRegStr2} $RegHive "$0" "InstallLocation" "$8" 0
+-    ${WriteRegStr2} $RegHive "$0" "Publisher" "Mozilla" 0
++    ${WriteRegStr2} $RegHive "$0" "Publisher" "${CompanyName}" 0
+     ${WriteRegStr2} $RegHive "$0" "UninstallString" "$\"$8\uninstall\helper.exe$\"" 0
+     DeleteRegValue SHCTX "$0" "URLInfoAbout"
+ ; Don't add URLUpdateInfo which is the release notes url except for the release
 diff --git a/browser/installer/windows/nsis/uninstaller.nsi b/browser/installer/windows/nsis/uninstaller.nsi
 index becbb0f70c..fb7bfbad53 100755
 --- a/browser/installer/windows/nsis/uninstaller.nsi

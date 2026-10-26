@@ -52,6 +52,8 @@ pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 pref("browser.newtabpage.activity-stream.showSponsored", false);
 pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 pref("browser.newtabpage.activity-stream.showSponsoredCheckboxes", false);
+// The new-tab weather widget fetches location-based data from Mozilla.
+pref("browser.newtabpage.activity-stream.showWeather", false);
 pref("browser.urlbar.quicksuggest.enabled", false);
 pref("browser.urlbar.suggest.quicksuggest.sponsored", false);
 pref("browser.urlbar.suggest.quicksuggest.nonsponsored", false);
