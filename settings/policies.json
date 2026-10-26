@@ -3,6 +3,11 @@
     "DisableTelemetry": true,
     "DisableFirefoxStudies": true,
     "DisablePocket": true,
+    "UserMessaging": {
+      "MoreFromMozilla": false,
+      "FirefoxLabs": false,
+      "Locked": false
+    },
     "SearchEngines": {
       "Default": "DuckDuckGo"
     },

@@ -1,0 +1,31 @@
+diff --git a/browser/base/content/aboutDialog.xhtml b/browser/base/content/aboutDialog.xhtml
+index 3ffd464b96..4473dc2b80 100644
+--- a/browser/base/content/aboutDialog.xhtml
++++ b/browser/base/content/aboutDialog.xhtml
+@@ -35,6 +35,7 @@
+ 
+     <html:link rel="localization" href="branding/brand.ftl"/>
+     <html:link rel="localization" href="browser/aboutDialog.ftl"/>
++    <html:link rel="localization" href="branding/goat.ftl"/>
+   </linkset>
+ 
+   <html:div id="aboutDialogContainer">
+@@ -124,13 +125,12 @@
+               <label is="text-link" useoriginprincipal="true" href="about:credits" data-l10n-name="community-exp-creditsLink"/>
+             </description>
+           </vbox>
+-          <description class="text-blurb" id="communityDesc" data-l10n-id="community-2">
+-            <label is="text-link" href="https://www.mozilla.org/?utm_source=firefox-browser&#38;utm_medium=firefox-desktop&#38;utm_campaign=about-dialog" data-l10n-name="community-mozillaLink"/>
+-            <label is="text-link" useoriginprincipal="true" href="about:credits" data-l10n-name="community-creditsLink"/>
++          <description class="text-blurb" id="communityDesc" data-l10n-id="goat-about-desc">
++            <label is="text-link" href="https://www.mozilla.org/firefox/" data-l10n-name="goat-firefox-link"/>
++            <label is="text-link" useoriginprincipal="true" href="about:credits" data-l10n-name="goat-credits-link"/>
+           </description>
+-          <description class="text-blurb" id="contributeDesc" data-l10n-id="helpus">
+-            <label is="text-link" href="https://foundation.mozilla.org/?form=firefox-about" data-l10n-name="helpus-donateLink"/>
+-            <label is="text-link" href="https://www.mozilla.org/contribute/?utm_source=firefox-browser&#38;utm_medium=firefox-desktop&#38;utm_campaign=about-dialog" data-l10n-name="helpus-getInvolvedLink"/>
++          <description class="text-blurb" id="contributeDesc" data-l10n-id="goat-about-project">
++            <label is="text-link" href="https://github.com/RSwebber/Goat-Browser" data-l10n-name="goat-project-link"/>
+           </description>
+         </vbox>
+       </vbox>
