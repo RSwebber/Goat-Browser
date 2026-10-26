@@ -1,6 +1,9 @@
 # Upstream Firefox ESR source checkout (fetched locally, never committed)
 engine/
 
+# Python venv for scripts/make_branding.py (Pillow)
+.venv-tools/
+
 # Build output and logs
 obj-*/
 build-logs/

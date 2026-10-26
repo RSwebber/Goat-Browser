@@ -1,0 +1,8 @@
+* text=auto
+*.patch -text
+*.sh text eol=lf
+mozconfig text eol=lf
+*.xpi binary
+*.ico binary
+*.icns binary
+*.bmp binary
