@@ -4,9 +4,10 @@ Goat Browser is a privacy-, security- and customization-focused web browser
 built as a fork of **Firefox ESR**. The current base is Firefox
 **153.5.1esr** (see [`ESR_VERSION`](ESR_VERSION)).
 
-> Status: step 3. Goat branding, privacy defaults, policies, a bundled uBlock
+> Status: step 4. Goat branding, privacy defaults, policies, a bundled uBlock
 > Origin, Goat themes and a Goat settings pane are applied on top of upstream
-> Firefox ESR.
+> Firefox ESR. There's a Windows installer and a routine for updating to new
+> ESR releases.
 
 ![Goat settings pane](docs/screenshots/goat-settings.png)
 
@@ -55,8 +56,8 @@ applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
 - **Privacy defaults** (`branding/goat/pref/firefox-branding.js`): strict
   Enhanced Tracking Protection, `privacy.resistFingerprinting`, HTTPS-Only
   Mode, telemetry, data reporting and studies off, sponsored content,
-  Firefox Suggest, add-on recommendations and discovery off, no default-browser
-  prompt. These are ordinary defaults, so users can change them in
+  Firefox Suggest, the new-tab weather widget, add-on recommendations and
+  discovery off, no default-browser prompt. These are ordinary defaults, so users can change them in
   `about:config`.
 - **Policies** (`settings/policies.json`): DisableTelemetry,
   DisableFirefoxStudies, DisablePocket, DuckDuckGo as the default search
@@ -96,6 +97,11 @@ applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
   - `0006-goat-builtin-themes.patch`: registers Goat Dark and Goat Light as
     built-in themes and switches new profiles to Goat Dark once. After that,
     the user's theme choice is left alone.
+  - `0007-installer-goat-links.patch`: publisher "Goat" in Apps &
+    features, and the uninstaller's feedback checkbox opens a GitHub issue
+    instead of Mozilla's survey.
+  - `0008-package-distribution-dir.patch`: always packages `distribution/`
+    (policies and uBlock Origin).
 
 ### Known leftovers
 
@@ -165,12 +171,103 @@ Download the latest signed `.xpi` from addons.mozilla.org
 SHA-256 against the hash published by the AMO API. The policy's `install_url`
 also points at AMO's latest version, so a removed copy is reinstalled online.
 
-### Packaging (step 4)
+### Packaging and the Windows installer
 
-`policies.json` and the bundled `.xpi` are installed by the build into
-`dist/bin/distribution/`. The installer's package manifest already ships
-`@RESPATH@/distribution/*`. **The packaging step must verify that both are
-present in the installer and the zip.**
+```bash
+cd /c/goat && source scripts/apply.sh
+cd engine
+./mach package
+```
+
+`./mach package` builds both the zip and the full NSIS installer (NSIS ships
+with MozillaBuild):
+
+- `engine/obj-x86_64-pc-windows-msvc/dist/goat-<ver>.en-US.win64.installer.exe`
+- `engine/obj-x86_64-pc-windows-msvc/dist/goat-<ver>.en-US.win64.zip`
+
+`policies.json` and the bundled uBlock Origin `.xpi` are installed by the
+build into `dist/bin/distribution/`. Upstream only packages that folder for
+Mozilla's own builds, so `patches/0008` ships it unconditionally. Check
+each new package:
+
+```bash
+~/.mozbuild/7zz/7zz.exe l dist/goat-*.installer.exe | grep -E 'distribution|\.exe$'
+```
+
+It should list `core\distribution\policies.json` and
+`core\distribution\extensions\uBlock0@raymondhill.net.xpi`, plus `goat.exe`,
+and no `firefox.exe`, `updater.exe`, `crashreporter.exe` or maintenance
+service. (`pingsender.exe` is included but only runs when telemetry sends a
+ping, and telemetry is off.)
+
+## Installing
+
+Run `Goat-Browser-Setup-<version>.exe` and click **Yes** on the Windows
+permission (UAC) prompt. Goat installs to `C:\Program Files\Goat Browser`,
+adds "Goat" and "Goat Private Browsing" Start Menu entries, and registers as
+a browser in Windows Settings → Default apps. It does **not** make itself
+the default browser. If you decline the UAC prompt, the installer falls back
+to a per-user install in `%LOCALAPPDATA%\Goat Browser`. In Settings → Apps
+it is listed as "Goat Browser ESR (x64 en-US)", publisher "Goat".
+
+Uninstall from Windows Settings → Apps → Installed apps. Profiles
+(`%APPDATA%\Goat`) are kept, as with Firefox.
+
+Tested on Windows 11 (153.5.1esr): Program Files install, Start Menu launch
+with a fresh profile (policies, Goat Dark, uBlock Origin, strict ETP,
+HTTPS-Only, RFP and telemetry off all as expected), Default apps listing,
+and a clean uninstall (files, Start Menu entries and uninstall entry
+removed).
+
+> Testing note: run installers from Explorer, not from inside a packaged
+> (MSIX) app such as an AI assistant's shell. Windows silently redirects
+> such an app's AppData and registry writes into its private container, so
+> the install looks successful but isn't visible to Windows.
+
+### SmartScreen (unsigned installer)
+
+The installer is **not code-signed** yet. When it has been downloaded from
+the internet, Windows SmartScreen shows "Windows protected your PC". Click
+**More info** → **Run anyway**. The UAC prompt then shows the publisher as
+"Unknown". Check the installer's SHA-256 against the one published with the
+release before running it:
+
+```powershell
+Get-FileHash .\Goat-Browser-Setup-<version>.exe -Algorithm SHA256
+```
+
+A code-signing certificate would remove both warnings. Signing is a separate
+decision, so it isn't set up.
+
+## Updating to a new Firefox ESR
+
+Mozilla ships an ESR **point release** (security fixes) about every 4 weeks,
+and a new **major ESR** roughly once a year. Goat has **no auto-updater**
+(`--disable-updater`), so users update by installing the new installer over
+the old one. Their profile is kept.
+
+1. **Check**: `scripts/check-esr.sh` prints whether a newer ESR exists.
+   A weekly GitHub Actions workflow (`.github/workflows/esr-check.yml`) runs
+   the same check and opens an issue titled "New Firefox ESR available:
+   <ver>" if there isn't one already. It never builds anything.
+2. **Update the source** (MozillaBuild shell):
+
+   ```bash
+   cd /c/goat
+   scripts/update-esr.sh 153.6.0esr
+   ```
+
+   This reverts Goat's patches, shallow-fetches the
+   `FIREFOX_<ver>esr_RELEASE` tag into `engine/`, dry-runs every patch with
+   `git apply --check` (and stops with a list of conflicting patches if any
+   fail), re-applies the overlay and updates `ESR_VERSION`.
+3. **Build and package**: `source scripts/apply.sh`, then `cd engine`,
+   `./mach build` and `./mach package`. For a point release an incremental
+   build is enough; for a new major ESR run `./mach clobber` first and expect
+   to rework some patches.
+4. **Test** the installer (install, launch, check `about:policies`, the Goat
+   settings pane, uBlock Origin, uninstall), then commit `ESR_VERSION` and
+   any reworked patches.
 
 ## License
 
