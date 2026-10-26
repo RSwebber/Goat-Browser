@@ -18,6 +18,8 @@ pref("app.update.url.details", "");
 // --- Tracking protection, fingerprinting, HTTPS ------------------------------
 pref("browser.contentblocking.category", "strict");
 pref("privacy.resistFingerprinting", true);
+// Edited from the Goat settings pane; upstream's default is a test placeholder.
+pref("privacy.resistFingerprinting.exemptedDomains", "");
 pref("dom.security.https_only_mode", true);
 pref("dom.security.https_only_mode_ever_enabled", true);
 

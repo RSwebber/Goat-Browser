@@ -20,3 +20,15 @@ browser.jar:
   content/branding/icon64.png                    (../default64.png)
   content/branding/icon128.png                   (../default128.png)
   content/branding/aboutDialog.css
+
+# Goat settings pane (about:preferences#goat)
+  content/branding/goat-settings.mjs
+
+# Goat built-in themes, installed via BuiltInThemeConfig (patches/0006)
+% resource goat-themes %content/branding/themes/
+  content/branding/themes/goat-dark/manifest.json  (themes/goat-dark/manifest.json)
+  content/branding/themes/goat-dark/icon.svg       (themes/goat-dark/icon.svg)
+  content/branding/themes/goat-dark/preview.svg    (themes/goat-dark/preview.svg)
+  content/branding/themes/goat-light/manifest.json (themes/goat-light/manifest.json)
+  content/branding/themes/goat-light/icon.svg      (themes/goat-light/icon.svg)
+  content/branding/themes/goat-light/preview.svg   (themes/goat-light/preview.svg)

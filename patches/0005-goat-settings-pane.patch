@@ -1,0 +1,46 @@
+diff --git a/browser/components/preferences/preferences.js b/browser/components/preferences/preferences.js
+index c76a0647e1..89edc898ca 100644
+--- a/browser/components/preferences/preferences.js
++++ b/browser/components/preferences/preferences.js
+@@ -301,6 +301,17 @@ const CONFIG_PANES = Object.freeze({
+     groupIds: ["firefoxLabsFeatures"],
+     module: "chrome://browser/content/preferences/config/firefoxLabs.mjs",
+   },
++  goat: {
++    l10nId: "goat-pane-header",
++    iconSrc: "chrome://branding/content/icon32.png",
++    groupIds: [
++      "goatAppearance",
++      "goatPrivacyLevel",
++      "goatPrivacyToggles",
++      "goatShortcuts",
++    ],
++    module: "chrome://branding/content/goat-settings.mjs",
++  },
+   general: {
+     l10nId: "pane-general-title",
+     groupIds: [],
+diff --git a/browser/components/preferences/preferences.xhtml b/browser/components/preferences/preferences.xhtml
+index 1b8c381593..76e6a99dba 100644
+--- a/browser/components/preferences/preferences.xhtml
++++ b/browser/components/preferences/preferences.xhtml
+@@ -40,6 +40,7 @@
+   <link rel="stylesheet" href="chrome://browser/content/preferences/widgets/setting-control.css" />
+ 
+   <link rel="localization" href="branding/brand.ftl"/>
++  <link rel="localization" href="branding/goat.ftl"/>
+   <link rel="localization" href="browser/browser.ftl"/>
+     <!-- Used by fontbuilder.js -->
+   <link rel="localization" href="browser/preferences/fonts.ftl"/>
+@@ -124,6 +125,11 @@
+         iconsrc="chrome://browser/skin/preferences/category-sync.svg"
+         data-l10n-id="pane-sync-title3">
+       </html:moz-page-nav-button>
++      <html:moz-page-nav-button id="category-goat"
++        view="paneGoat"
++        iconsrc="chrome://branding/content/icon32.png"
++        data-l10n-id="pane-goat-title">
++      </html:moz-page-nav-button>
+       <html:moz-page-nav-button id="category-home"
+         view="paneHome"
+         iconsrc="chrome://browser/skin/home.svg"
