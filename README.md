@@ -4,33 +4,69 @@ Goat Browser is a privacy-, security- and customization-focused web browser
 built as a fork of **Firefox ESR**. The current base is Firefox
 **153.5.1esr** (see [`ESR_VERSION`](ESR_VERSION)).
 
-> Status: step 1. An unmodified Firefox ESR builds and runs from this layout.
-> No Goat-specific changes have been made yet.
+> Status: step 2. Goat branding, privacy defaults, enterprise policies and a
+> bundled uBlock Origin are applied on top of upstream Firefox ESR.
 
 ## Layout
 
 ```
 goat/
-├── engine/          upstream Firefox ESR source (local checkout, NOT committed)
-├── scripts/         build/setup notes and helper scripts
-│   └── setup.md     toolchain versions used
-├── ESR_VERSION      exact upstream version, tag and commit we build on
-├── LICENSE          MPL-2.0
-└── README.md
+├── engine/                upstream Firefox ESR source (local checkout, NOT committed)
+├── branding/
+│   ├── GOAT.png           original logo
+│   ├── goat-logo.png      transparent, square-cropped logo (generated)
+│   └── goat/              branding dir -> engine/browser/branding/goat
+│       └── pref/firefox-branding.js   built-in privacy defaults
+├── settings/
+│   ├── policies.json      enterprise policies -> dist/bin/distribution/
+│   ├── distribution/extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
+│   └── moz.build          installs the two above during the build
+├── patches/               source patches against engine/ (git-apply format)
+├── scripts/
+│   ├── apply.sh           stages the overlay onto engine/ and sets MOZCONFIG
+│   ├── make_branding.py   regenerates all branding images from GOAT.png
+│   └── setup.md           toolchain versions used
+├── mozconfig              build options
+├── ESR_VERSION            exact upstream version, tag and commit we build on
+└── LICENSE                MPL-2.0
 ```
 
-`engine/` is a plain checkout of upstream Firefox at the tag in
-`ESR_VERSION`. It is gitignored. Our own changes will live in this repo as:
+`engine/` is a plain checkout of upstream Firefox at the tag in `ESR_VERSION`,
+and it is gitignored. All Goat changes live in this repo and are copied or
+applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
 
-- **patches/**: patches applied on top of `engine/`
-- **prefs/**: default preference overrides (privacy/security hardening)
-- **branding/**: Goat Browser name, icons and branding files
+### What Goat changes
 
-(These directories will be added as the work begins.)
+- **Branding**: name "Goat" / "Goat Browser", vendor "Goat", executable
+  `goat.exe`, and the goat logo for every icon, the About dialog and the
+  installer bitmaps. Private-browsing icons use an inverted logo.
+- **Build options** (`mozconfig`): updater, crash reporter and default-browser
+  agent disabled; release build on the `esr` update channel; optimized and
+  non-debug.
+- **Privacy defaults** (`branding/goat/pref/firefox-branding.js`): strict
+  Enhanced Tracking Protection, `privacy.resistFingerprinting`, HTTPS-Only
+  Mode, telemetry, data reporting and studies off, sponsored content,
+  Firefox Suggest, add-on recommendations and discovery off, no default-browser
+  prompt. These are ordinary defaults, so users can change them in
+  `about:config`.
+- **Policies** (`settings/policies.json`): DisableTelemetry,
+  DisableFirefoxStudies, DisablePocket, DuckDuckGo as the default search
+  engine, and uBlock Origin installed as `normal_installed` (the user can
+  disable it, but it is reinstalled if removed).
+- **Patches** (`patches/`):
+  - `0001-set-app-vendor-goat.patch`: sets the build vendor to "Goat" (this
+    ESR doesn't allow it in a mozconfig). The Firefox app ID is kept, so
+    add-ons from addons.mozilla.org remain compatible.
+  - `0002-honour-default-etp-category.patch`: makes a built-in default
+    tracking-protection category ("strict") take effect on new profiles.
+    Upstream recalculates the category from its sub-prefs, so a plain default
+    would be ignored. Users can still switch to Standard or Custom.
+  - `0003-windows-company-name-goat.patch`: "Goat" instead of "Mozilla
+    Corporation" in the Windows file properties of goat.exe.
 
 ## Building on Windows
 
-These are the steps used for the first build (Windows 11, i7-12700H, 16 GB RAM).
+These are the steps used on the first machine (Windows 11, i7-12700H, 16 GB RAM).
 
 1. **Install MozillaBuild** to `C:\mozilla-build` from
    <https://ftp.mozilla.org/pub/mozilla/libraries/win32/MozillaBuildSetup-Latest.exe>.
@@ -49,21 +85,53 @@ These are the steps used for the first build (Windows 11, i7-12700H, 16 GB RAM).
 
    ```bash
    cd /c/goat/engine
-   ./mach --no-interactive bootstrap --application-choice browser
+   ./mach --no-interactive bootstrap --application-choice browser   # first time only
+   cd /c/goat
+   source scripts/apply.sh          # stage the overlay, export MOZCONFIG
+   cd engine
    ./mach build
-   ./mach run
+   ./mach run --temp-profile
    ```
 
-On the first machine, bootstrap took about 12 minutes and the full build took
-**about 69 minutes** (4155 s), with Windows Defender left at its defaults.
-Adding Defender exclusions for `C:\goat`, `C:\mozilla-build` and
+   Always `source scripts/apply.sh` in a new shell before building, so that
+   `MOZCONFIG` points at `C:\goat\mozconfig`.
+
+On the first machine, bootstrap took about 12 minutes and the first
+unmodified build took about 69 minutes (4155 s). The first Goat build is
+listed in `scripts/setup.md`. Windows Defender was left at its defaults; adding
+Defender exclusions for `C:\goat`, `C:\mozilla-build` and
 `%USERPROFILE%\.mozbuild` should make builds faster.
 
-The build output is in `engine/obj-x86_64-pc-windows-msvc/dist/bin/firefox.exe`.
-Until our branding is added, the unbranded build shows the name "Nightly".
+The build output is `engine/obj-x86_64-pc-windows-msvc/dist/bin/goat.exe`.
+
+### Regenerating the branding images
+
+If `branding/GOAT.png` changes:
+
+```bash
+python -m venv .venv-tools
+.venv-tools/Scripts/python -m pip install Pillow
+.venv-tools/Scripts/python scripts/make_branding.py
+```
+
+### Updating uBlock Origin
+
+Download the latest signed `.xpi` from addons.mozilla.org
+(<https://addons.mozilla.org/firefox/addon/ublock-origin/>), replace
+`settings/distribution/extensions/uBlock0@raymondhill.net.xpi`, and check its
+SHA-256 against the hash published by the AMO API. The policy's `install_url`
+also points at AMO's latest version, so a removed copy is reinstalled online.
+
+### Packaging (step 4)
+
+`policies.json` and the bundled `.xpi` are installed by the build into
+`dist/bin/distribution/`. The installer's package manifest already ships
+`@RESPATH@/distribution/*`. **The packaging step must verify that both are
+present in the installer and the zip.**
 
 ## License
 
 Goat Browser is licensed under the [Mozilla Public License 2.0](LICENSE), the
-same license as the Firefox source it is based on. "Firefox" is a Mozilla
-trademark, and Goat Browser is not affiliated with or endorsed by Mozilla.
+same license as the Firefox source it is based on. uBlock Origin is GPLv3 and
+is redistributed unmodified. "Firefox" is a Mozilla trademark, and Goat
+Browser is not affiliated with or endorsed by Mozilla.

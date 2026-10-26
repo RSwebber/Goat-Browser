@@ -33,6 +33,11 @@ headers/libs and the Windows SDK into `%USERPROFILE%\.mozbuild`.
 Plus mozmake, sccache, nsis, upx, dump_syms and other helpers under
 `%USERPROFILE%\.mozbuild`.
 
+## Branding tools
+
+`C:\goat\.venv-tools` (gitignored) is a Python 3.12 venv with Pillow 13.0.0,
+used by `scripts/make_branding.py`.
+
 ## Antivirus
 
 Windows Defender settings were left unchanged. If builds are slow, consider
