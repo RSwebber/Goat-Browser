@@ -5,14 +5,21 @@ Usage (from C:\\goat):
 
 1. Makes branding/goat-logo.png: the outer white background flood-filled to
    transparency (white inside the black circle is kept), cropped to a square.
-2. Rewrites every raster image in branding/goat/ with a Goat version at the
-   same pixel size and format. Private-browsing images use an inverted logo.
+2. Writes every raster image listed in IMAGES below into branding/goat/.
+   Private-browsing images use an inverted logo.
 3. Writes about-logo.svg (embedded PNG) and text "Goat" wordmarks.
+
+IMAGES is the single source of truth for each image's size, format, variant,
+backdrop and margin. The script stops if branding/goat holds a raster that
+isn't listed, or the table lists one that doesn't exist. On a major ESR
+update, compare the table with upstream's browser/branding/unofficial.
 """
 
 import base64
 import io
 import pathlib
+import sys
+from typing import NamedTuple, Optional
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 
@@ -20,10 +27,84 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 BRANDING = ROOT / "branding"
 GOAT_DIR = BRANDING / "goat"
 
-# Images that represent private browsing get the inverted logo.
-PRIVATE = ("private", "pbmode")
-# Non-square or photographic images get the logo centered on a backdrop.
-BACKDROP_BLACK = {"background.png", "bgstub.jpg", "about.png"}
+RASTER_SUFFIXES = (".png", ".ico", ".icns", ".bmp", ".jpg")
+
+BLACK = (0, 0, 0, 255)
+WHITE = (255, 255, 255, 255)
+
+
+class Spec(NamedTuple):
+    # PNG (transparent unless backdrop is set), PNG-RGB (opaque PNG), ICO,
+    # ICNS, BMP or JPEG.
+    format: str
+    # (width, height). ICO: the largest size; ICNS: always 1024x1024.
+    size: tuple
+    # Logo margin as a fraction of the shorter side.
+    margin: float = 0.04
+    private: bool = False
+    backdrop: Optional[tuple] = None
+    # ICO only: the sizes stored in the file.
+    ico_sizes: tuple = ()
+
+
+def png(w, h=None, **kw):
+    return Spec("PNG", (w, h or w), **kw)
+
+
+def ico(*sizes, **kw):
+    sizes = tuple((s, s) for s in sizes)
+    return Spec("ICO", max(sizes), ico_sizes=sizes, **kw)
+
+
+ICNS = Spec("ICNS", (1024, 1024))
+
+# Non-square images use a 0.12 margin, square ones 0.04.
+IMAGES = {
+    "background.png": png(1440, 880, margin=0.12, backdrop=BLACK),
+    "content/about-logo-private.png": png(192, private=True),
+    "content/about-logo-private@2x.png": png(384, private=True),
+    "content/about-logo.png": png(192),
+    "content/about-logo@2x.png": png(384),
+    "content/about.png": Spec("PNG-RGB", (300, 236), margin=0.12, backdrop=BLACK),
+    "default128.png": png(128),
+    "default16.png": png(16),
+    "default22.png": png(22),
+    "default24.png": png(24),
+    "default256.png": png(256),
+    "default32.png": png(32),
+    "default48.png": png(48),
+    "default64.png": png(64),
+    "disk.icns": ICNS,
+    "document.icns": ICNS,
+    "document.ico": ico(16, 32, 48, 256),
+    "document_pdf.ico": ico(256),
+    "firefox.icns": ICNS,
+    "firefox.ico": ico(16, 32, 48, 256),
+    "firefox64.ico": ico(16, 32, 48, 64),
+    "msix/Assets/Document44x44.png": png(44),
+    "msix/Assets/LargeTile.scale-200.png": png(620),
+    "msix/Assets/MedTile.scale-200.png": png(300),
+    "msix/Assets/SmallTile.scale-200.png": png(142),
+    "msix/Assets/Square150x150Logo.scale-200.png": png(300),
+    "msix/Assets/Square44x44Logo.altform-lightunplated_targetsize-256.png": png(256),
+    "msix/Assets/Square44x44Logo.altform-unplated_targetsize-256.png": png(256),
+    "msix/Assets/Square44x44Logo.scale-200.png": png(88),
+    "msix/Assets/Square44x44Logo.targetsize-256.png": png(256),
+    "msix/Assets/StoreLogo.scale-200.png": png(100),
+    "msix/Assets/Wide310x150Logo.scale-200.png": png(620, 300, margin=0.12),
+    "newtab.ico": ico(16, 32),
+    "newwindow.ico": ico(16, 32),
+    "pbmode.ico": ico(256, private=True),
+    "PrivateBrowsing_150.png": png(300, private=True),
+    "PrivateBrowsing_70.png": png(142, private=True),
+    "stubinstaller/bgstub.jpg": Spec("JPEG", (1344, 822), margin=0.12, backdrop=BLACK),
+    "VisualElements_150.png": png(300),
+    "VisualElements_70.png": png(142),
+    # Installer bitmaps, on white.
+    "wizHeader.bmp": Spec("BMP", (150, 57), margin=0.12, backdrop=WHITE),
+    "wizHeaderRTL.bmp": Spec("BMP", (150, 57), margin=0.12, backdrop=WHITE),
+    "wizWatermark.bmp": Spec("BMP", (164, 314), margin=0.12, backdrop=WHITE),
+}
 
 
 def make_transparent_logo(src):
@@ -78,41 +159,50 @@ def fit(logo, size, margin=0.0):
     return canvas
 
 
-def render(logo, size, backdrop=None, margin=0.04):
+def render(logo, size, backdrop, margin):
     w, h = size
     canvas = Image.new("RGBA", (w, h), backdrop or (0, 0, 0, 0))
     side = min(w, h)
-    margin = margin if w == h else 0.12
     icon = fit(logo, side, margin)
     canvas.alpha_composite(icon, ((w - side) // 2, (h - side) // 2))
     return canvas
 
 
-def logo_for(path, logo, logo_private):
-    return logo_private if any(k in path.name.lower() for k in PRIVATE) else logo
-
-
-def regenerate(path, logo, logo_private):
-    src = Image.open(path)
-    fmt = src.format
-    lg = logo_for(path, logo, logo_private)
-    name = path.name
-
-    if fmt == "ICO":
-        sizes = sorted(src.info.get("sizes", {src.size}))
-        big = render(lg, (max(s[0] for s in sizes),) * 2)
-        big.save(path, format="ICO", sizes=sizes)
-    elif fmt == "ICNS":
-        render(lg, (1024, 1024)).save(path, format="ICNS")
-    elif fmt in ("BMP", "JPEG") or src.mode == "RGB":
-        # Opaque formats: installer bitmaps on white, splash art on black.
-        back = (0, 0, 0, 255) if name in BACKDROP_BLACK else (255, 255, 255, 255)
-        img = render(lg, src.size, back).convert("RGB")
-        img.save(path, format=fmt, **({"quality": 92} if fmt == "JPEG" else {}))
+def write_image(rel, spec, logo, logo_private):
+    path = GOAT_DIR / rel
+    lg = logo_private if spec.private else logo
+    img = render(lg, spec.size, spec.backdrop, spec.margin)
+    if spec.format == "ICO":
+        img.save(path, format="ICO", sizes=list(spec.ico_sizes))
+    elif spec.format == "ICNS":
+        img.save(path, format="ICNS")
+    elif spec.format == "PNG":
+        img.save(path, format="PNG", optimize=True)
+    elif spec.format == "PNG-RGB":
+        img.convert("RGB").save(path, format="PNG")
+    elif spec.format == "JPEG":
+        img.convert("RGB").save(path, format="JPEG", quality=92)
+    elif spec.format == "BMP":
+        img.convert("RGB").save(path, format="BMP")
     else:
-        back = (0, 0, 0, 255) if name in BACKDROP_BLACK else None
-        render(lg, src.size, back).save(path, format="PNG", optimize=True)
-    return f"{path.relative_to(GOAT_DIR)} {fmt} {src.size}"
+        raise ValueError(f"{rel}: unknown format {spec.format}")
+    return f"{rel} {spec.format} {spec.size}"
+
+
+def check_table():
+    """Every raster in branding/goat is in IMAGES, and vice versa."""
+    on_disk = {
+        p.relative_to(GOAT_DIR).as_posix()
+        for p in GOAT_DIR.rglob("*")
+        if p.suffix.lower() in RASTER_SUFFIXES
+    }
+    missing = sorted(on_disk - IMAGES.keys())
+    stale = sorted(IMAGES.keys() - on_disk)
+    for rel in missing:
+        print(f"not in IMAGES: branding/goat/{rel}", file=sys.stderr)
+    for rel in stale:
+        print(f"in IMAGES but missing: branding/goat/{rel}", file=sys.stderr)
+    return not (missing or stale)
 
 
 LICENSE_HEADER = (
@@ -147,14 +237,16 @@ def write_svgs(logo):
 
 
 def main():
+    if not check_table():
+        sys.exit("make_branding: IMAGES doesn't match branding/goat; fix the table first")
+
     logo = make_transparent_logo(BRANDING / "GOAT.png")
     logo.save(BRANDING / "goat-logo.png", optimize=True)
     print(f"goat-logo.png {logo.size}")
     logo_private = invert_logo(logo)
 
-    for path in sorted(GOAT_DIR.rglob("*")):
-        if path.suffix.lower() in (".png", ".ico", ".icns", ".bmp", ".jpg"):
-            print(regenerate(path, logo, logo_private))
+    for rel, spec in sorted(IMAGES.items()):
+        print(write_image(rel, spec, logo, logo_private))
     write_svgs(logo)
     print("svgs written")
 
