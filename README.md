@@ -76,9 +76,10 @@ goat/
     Firefox's fingerprinting protection, on via strict ETP, which keeps dark
     mode and local time). Under Maximum, a list of exempt sites
     (`privacy.resistFingerprinting.exemptedDomains`).
-  - Privacy: HTTPS-Only Mode, clear cookies and site data on close (same
-    semantics as Firefox's own checkbox; history is not cleared), and a button
-    for the uBlock Origin dashboard.
+  - Privacy: HTTPS-Only Mode (all windows, private windows only, or off)
+    and clear cookies and site data on close (history is not cleared). Both
+    are the Privacy pane's own settings, shown with Goat's labels. Plus a
+    button for the uBlock Origin dashboard.
   - Keyboard shortcuts: a link to Firefox's built-in editor, `about:keyboard`.
 - **Themes**: Goat Dark (the default on new profiles) and Goat Light are
   built-in themes and appear in Add-ons → Themes.

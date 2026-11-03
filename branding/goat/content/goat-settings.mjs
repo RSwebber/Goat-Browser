@@ -6,9 +6,11 @@
 // preferences.js by patches/0005). Every control reads and writes a real pref,
 // so everything here can also be changed or reset in about:config.
 //
-// Settings talk to Services.prefs directly instead of registering
-// Preferences.add() entries, because the stock panes register some of the
-// same prefs and Preferences.add() throws on duplicates.
+// HTTPS-Only and "delete cookies and site data when closed" are the Privacy
+// pane's own settings (httpsOnlyRadioGroup, deleteOnClose), which
+// config/privacy.mjs registers when the page loads. Prefs go through
+// Preferences.mjs: one that a stock pane already added is reused, otherwise
+// it is added here.
 
 import { Preferences } from "chrome://global/content/preferences/Preferences.mjs";
 import { SettingGroupManager } from "chrome://browser/content/preferences/config/SettingGroupManager.mjs";
@@ -16,7 +18,6 @@ import { SettingGroupManager } from "chrome://browser/content/preferences/config
 const lazy = {};
 ChromeUtils.defineESModuleGetters(lazy, {
   AddonManager: "resource://gre/modules/AddonManager.sys.mjs",
-  Sanitizer: "resource:///modules/Sanitizer.sys.mjs",
 });
 
 const THEME_DARK = "goat-dark@goat-browser";
@@ -24,71 +25,19 @@ const THEME_LIGHT = "goat-light@goat-browser";
 const THEME_SYSTEM = "default-theme@mozilla.org";
 const UBLOCK_ID = "uBlock0@raymondhill.net";
 
-// Cleaning prefs that "clear cookies and site data on close" must not turn on.
-// Mirrors SANITIZE_ON_SHUTDOWN_PREFS_ONLY_V2 in config/privacy.mjs.
-const OTHER_SHUTDOWN_CLEANING_PREFS = [
-  "privacy.clearOnShutdown_v2.browsingHistoryAndDownloads",
-  "privacy.clearOnShutdown_v2.siteSettings",
-];
-
-function readPref(name) {
-  switch (Services.prefs.getPrefType(name)) {
-    case Services.prefs.PREF_BOOL:
-      return Services.prefs.getBoolPref(name);
-    case Services.prefs.PREF_INT:
-      return Services.prefs.getIntPref(name);
-    case Services.prefs.PREF_STRING:
-      return Services.prefs.getStringPref(name);
-  }
-  return undefined;
+/** The Preference for `id`, added only if no stock pane has added it. */
+function pref(id, type) {
+  return Preferences.get(id) ?? Preferences.add({ id, type });
 }
 
-function writePref(name, value) {
-  switch (typeof value) {
-    case "boolean":
-      Services.prefs.setBoolPref(name, value);
-      break;
-    case "number":
-      Services.prefs.setIntPref(name, value);
-      break;
-    default:
-      Services.prefs.setStringPref(name, String(value));
-  }
-}
-
-/**
- * A setting backed by one or more prefs (the first is the main one).
- * `get` maps the main pref's value to the control value; `set` writes prefs.
- */
-function addPrefSetting(id, prefs, { get, set, ...rest } = {}) {
-  prefs = [].concat(prefs);
-  Preferences.addSetting({
-    id,
-    setup(emitChange) {
-      for (let p of prefs) {
-        Services.prefs.addObserver(p, emitChange);
-      }
-      return () => {
-        for (let p of prefs) {
-          Services.prefs.removeObserver(p, emitChange);
-        }
-      };
-    },
-    get: () => {
-      let value = readPref(prefs[0]);
-      return get ? get(value) : value;
-    },
-    set: value => {
-      if (set) {
-        set(value);
-      } else {
-        writePref(prefs[0], value);
-      }
-    },
-    disabled: () => prefs.some(p => Services.prefs.prefIsLocked(p)),
-    ...rest,
-  });
-}
+pref("extensions.activeThemeID", "string");
+pref("sidebar.verticalTabs", "bool");
+pref("sidebar.revamp", "bool");
+pref("browser.uidensity", "int");
+pref("browser.compactmode.show", "bool");
+pref("browser.toolbars.bookmarks.visibility", "string");
+pref("privacy.resistFingerprinting", "bool");
+pref("privacy.resistFingerprinting.exemptedDomains", "string");
 
 function topWindow() {
   return window.browsingContext.topChromeWindow;
@@ -96,112 +45,73 @@ function topWindow() {
 
 // --- Appearance --------------------------------------------------------------
 
-addPrefSetting("goat-theme", "extensions.activeThemeID", {
-  set(themeId) {
+Preferences.addSetting({
+  id: "goat-theme",
+  pref: "extensions.activeThemeID",
+  // Enabling the add-on updates the pref; returning a promise tells the
+  // setting not to write it as well.
+  set: themeId =>
     lazy.AddonManager.getAddonByID(themeId)
       .then(addon => addon?.enable())
-      .catch(console.error);
-  },
+      .catch(console.error),
 });
 
-addPrefSetting("goat-vertical-tabs", ["sidebar.verticalTabs", "sidebar.revamp"], {
+Preferences.addSetting({
+  id: "goat-vertical-tabs",
+  pref: "sidebar.verticalTabs",
   set(enabled) {
     if (enabled) {
       // Vertical tabs live in the new sidebar.
-      Services.prefs.setBoolPref("sidebar.revamp", true);
+      Preferences.get("sidebar.revamp").value = true;
     }
-    Services.prefs.setBoolPref("sidebar.verticalTabs", enabled);
+    return enabled;
   },
+  disabled: () => Preferences.get("sidebar.revamp").locked,
 });
 
-addPrefSetting("goat-compact", ["browser.uidensity", "browser.compactmode.show"], {
+Preferences.addSetting({
+  id: "goat-compact",
+  pref: "browser.uidensity",
   get: density => density == 1,
   set(enabled) {
     if (enabled) {
       // Also make "Compact" selectable in Customize Toolbar.
-      Services.prefs.setBoolPref("browser.compactmode.show", true);
+      Preferences.get("browser.compactmode.show").value = true;
     }
-    Services.prefs.setIntPref("browser.uidensity", enabled ? 1 : 0);
+    return enabled ? 1 : 0;
   },
 });
 
-addPrefSetting("goat-bookmarks-toolbar", "browser.toolbars.bookmarks.visibility");
+Preferences.addSetting({
+  id: "goat-bookmarks-toolbar",
+  pref: "browser.toolbars.bookmarks.visibility",
+});
 
 // --- Privacy level -----------------------------------------------------------
 
-addPrefSetting("goat-privacy-level", "privacy.resistFingerprinting", {
+Preferences.addSetting({
+  id: "goat-privacy-level",
+  pref: "privacy.resistFingerprinting",
   get: rfp => (rfp ? "maximum" : "balanced"),
   // "Balanced" relies on Fingerprinting Protection (privacy.fingerprintingProtection),
   // which strict Enhanced Tracking Protection already turns on.
-  set: level =>
-    Services.prefs.setBoolPref(
-      "privacy.resistFingerprinting",
-      level == "maximum"
-    ),
+  set: level => level == "maximum",
 });
 
-addPrefSetting(
-  "goat-rfp-exempt",
-  "privacy.resistFingerprinting.exemptedDomains",
-  {
-    deps: ["goat-privacy-level"],
-    visible: ({ "goat-privacy-level": level }) => level.value == "maximum",
-    set: value =>
-      Services.prefs.setStringPref(
-        "privacy.resistFingerprinting.exemptedDomains",
-        String(value)
-          .split(",")
-          .map(s => s.trim())
-          .filter(Boolean)
-          .join(",")
-      ),
-  }
-);
+Preferences.addSetting({
+  id: "goat-rfp-exempt",
+  pref: "privacy.resistFingerprinting.exemptedDomains",
+  deps: ["goat-privacy-level"],
+  visible: ({ "goat-privacy-level": level }) => level.value == "maximum",
+  set: value =>
+    String(value)
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean)
+      .join(","),
+});
 
 // --- Privacy toggles ---------------------------------------------------------
-
-addPrefSetting("goat-https-only", "dom.security.https_only_mode");
-
-addPrefSetting(
-  "goat-clear-on-close",
-  [
-    "privacy.sanitize.sanitizeOnShutdown",
-    "privacy.clearOnShutdown_v2.cookiesAndStorage",
-    "privacy.clearOnShutdown_v2.cache",
-  ],
-  {
-    // Same semantics as "Delete cookies and site data when closed" in the
-    // Privacy pane (config/privacy.mjs, "deleteOnClose").
-    get: () =>
-      Services.prefs.getBoolPref("privacy.sanitize.sanitizeOnShutdown") &&
-      Services.prefs.getBoolPref("privacy.clearOnShutdown_v2.cookiesAndStorage") &&
-      Services.prefs.getBoolPref("privacy.clearOnShutdown_v2.cache"),
-    set(enabled) {
-      lazy.Sanitizer.maybeMigratePrefs("clearOnShutdown");
-      let sanitizeWasOn = Services.prefs.getBoolPref(
-        "privacy.sanitize.sanitizeOnShutdown"
-      );
-      Services.prefs.setBoolPref(
-        "privacy.clearOnShutdown_v2.cookiesAndStorage",
-        enabled
-      );
-      Services.prefs.setBoolPref("privacy.clearOnShutdown_v2.cache", enabled);
-      if (!sanitizeWasOn) {
-        // Don't let sanitizeOnShutdown also clear history etc.
-        for (let p of OTHER_SHUTDOWN_CLEANING_PREFS) {
-          Services.prefs.setBoolPref(p, false);
-        }
-      }
-      let otherCleaning = OTHER_SHUTDOWN_CLEANING_PREFS.some(p =>
-        Services.prefs.getBoolPref(p, false)
-      );
-      Services.prefs.setBoolPref(
-        "privacy.sanitize.sanitizeOnShutdown",
-        enabled || otherCleaning
-      );
-    },
-  }
-);
 
 Preferences.addSetting({
   id: "goat-ublock-dashboard",
@@ -281,8 +191,24 @@ SettingGroupManager.registerGroups({
     iconSrc: "chrome://browser/skin/controlcenter/3rdpartycookies.svg",
     headingLevel: 2,
     items: [
-      { id: "goat-https-only", l10nId: "goat-https-only", control: "moz-toggle" },
-      { id: "goat-clear-on-close", l10nId: "goat-clear-on-close", control: "moz-toggle" },
+      // The Privacy pane's settings, with Goat's labels.
+      {
+        id: "httpsOnlyRadioGroup",
+        l10nId: "goat-https-only",
+        control: "moz-radio-group",
+        controlAttrs: { id: "goat-https-only" },
+        options: [
+          { value: "enabled", l10nId: "httpsonly-radio-enabled" },
+          { value: "privateOnly", l10nId: "httpsonly-radio-enabled-pbm" },
+          { value: "disabled", l10nId: "httpsonly-radio-disabled3" },
+        ],
+      },
+      {
+        id: "deleteOnClose",
+        l10nId: "goat-clear-on-close",
+        control: "moz-toggle",
+        controlAttrs: { id: "goat-clear-on-close" },
+      },
       {
         id: "goat-ublock-dashboard",
         l10nId: "goat-ublock-dashboard",
@@ -299,7 +225,6 @@ SettingGroupManager.registerGroups({
         id: "goat-shortcuts-link",
         l10nId: "goat-shortcuts-link",
         control: "moz-box-link",
-        controlAttrs: { href: "about:keyboard" },
       },
     ],
   },
