@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:57:03 -0400
+Subject: [PATCH] about dialog goat credit
+
+
 diff --git a/browser/base/content/aboutDialog.xhtml b/browser/base/content/aboutDialog.xhtml
-index 3ffd464b96..4473dc2b80 100644
+index 3ffd464b960a4299a7dd0cd87e4fc2f781b9d593..4473dc2b8041b08bf04d9c148f904f11c47fdcbb 100644
 --- a/browser/base/content/aboutDialog.xhtml
 +++ b/browser/base/content/aboutDialog.xhtml
 @@ -35,6 +35,7 @@

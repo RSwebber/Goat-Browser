@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:57:03 -0400
+Subject: [PATCH] goat settings pane
+
+
 diff --git a/browser/components/preferences/preferences.js b/browser/components/preferences/preferences.js
-index c76a0647e1..89edc898ca 100644
+index c76a0647e14bac806d9428483bb565b3e10c31e7..89edc898cad64747fcb55761047495290e969f88 100644
 --- a/browser/components/preferences/preferences.js
 +++ b/browser/components/preferences/preferences.js
 @@ -301,6 +301,17 @@ const CONFIG_PANES = Object.freeze({
@@ -21,7 +27,7 @@ index c76a0647e1..89edc898ca 100644
      l10nId: "pane-general-title",
      groupIds: [],
 diff --git a/browser/components/preferences/preferences.xhtml b/browser/components/preferences/preferences.xhtml
-index 1b8c381593..76e6a99dba 100644
+index 1b8c38159314b6edee9e6f455beb2b63db1ad3f0..76e6a99dba2a374ed908948d4db8d251d27271d9 100644
 --- a/browser/components/preferences/preferences.xhtml
 +++ b/browser/components/preferences/preferences.xhtml
 @@ -40,6 +40,7 @@

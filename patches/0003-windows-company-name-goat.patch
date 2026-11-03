@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:26:10 -0400
+Subject: [PATCH] windows company name goat
+
+
 diff --git a/browser/app/module.ver b/browser/app/module.ver
-index 5ef8d2a02a..529fd58088 100644
+index 5ef8d2a02aefd70f40f5828bdeca0aef77da0288..529fd580881acd9ce09e388d1836d87637faf795 100644
 --- a/browser/app/module.ver
 +++ b/browser/app/module.ver
 @@ -1,4 +1,4 @@
@@ -9,7 +15,7 @@ index 5ef8d2a02a..529fd58088 100644
  WIN32_MODULE_PRODUCTVERSION=@MOZ_APP_WINVERSION@
  WIN32_MODULE_PRODUCTVERSION_STRING=@MOZ_APP_VERSION@
 diff --git a/browser/app/pbproxy/module.ver b/browser/app/pbproxy/module.ver
-index 5ef8d2a02a..529fd58088 100644
+index 5ef8d2a02aefd70f40f5828bdeca0aef77da0288..529fd580881acd9ce09e388d1836d87637faf795 100644
 --- a/browser/app/pbproxy/module.ver
 +++ b/browser/app/pbproxy/module.ver
 @@ -1,4 +1,4 @@

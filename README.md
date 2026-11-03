@@ -30,9 +30,11 @@ goat/
 │           ├── policies.json          enterprise policies -> dist/bin/distribution/
 │           ├── extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
 │           └── moz.build              installs the two above during the build
-├── patches/               source patches against engine/ (git-apply format)
+├── patches/               source patches against engine/ (git format-patch queue)
 ├── scripts/
-│   ├── apply.sh           stages the overlay and mozconfig onto engine/
+│   ├── apply.sh           builds branch goat in engine/, stages the overlay and mozconfig
+│   ├── update-esr.sh      first-time fetch of engine/, or rebase onto a new ESR
+│   ├── check-esr.sh       is a newer ESR out?
 │   ├── make_branding.py   regenerates all branding images from GOAT.png
 │   └── setup.md           toolchain versions used
 ├── docs/screenshots/      screenshots used in this README
@@ -41,9 +43,10 @@ goat/
 └── LICENSE                MPL-2.0
 ```
 
-`engine/` is a plain checkout of upstream Firefox at the tag in `ESR_VERSION`,
-and it is gitignored. All Goat changes live in this repo and are copied or
-applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
+`engine/` is a shallow checkout of upstream Firefox at the tag in
+`ESR_VERSION`, and it is gitignored. All Goat changes live in this repo:
+`scripts/apply.sh` commits `patches/` onto a local branch `goat` in
+`engine/` and copies the rest in. It is safe to rerun.
 
 ### What Goat changes
 
@@ -123,28 +126,24 @@ These are the steps used on the first machine (Windows 11, i7-12700H, 16 GB RAM)
    MSVC libraries and the Windows SDK itself.
 2. **Enable long paths in git**: `git config --global core.longpaths true`
 3. **Clone this repo** to a path with no spaces, e.g. `C:\goat`.
-4. **Fetch the engine** at the tag listed in `ESR_VERSION` (shallow clone):
+4. **Open the MozillaBuild shell** (`C:\mozilla-build\start-shell.bat`) and run:
 
    ```bash
-   git clone --depth 1 --branch FIREFOX_153_5_1esr_RELEASE \
-       https://github.com/mozilla-firefox/firefox C:/goat/engine
-   ```
-
-5. **Open the MozillaBuild shell** (`C:\mozilla-build\start-shell.bat`) and run:
-
-   ```bash
-   cd /c/goat/engine
-   ./mach --no-interactive bootstrap --application-choice browser   # first time only
    cd /c/goat
-   scripts/apply.sh                 # stage the overlay and engine/mozconfig
+   scripts/update-esr.sh            # fetch engine/ at the ESR_VERSION tag, apply Goat
    cd engine
+   ./mach --no-interactive bootstrap --application-choice browser   # first time only
    ./mach build
    ./mach run --temp-profile
    ```
 
-   `apply.sh` copies `mozconfig` to `engine/mozconfig`, where mach finds it
-   by itself, so `./mach build` picks up Goat's options in any shell. Rerun
-   `apply.sh` after changing anything in this repo.
+   With no `engine/` yet, `update-esr.sh` runs `git init`, shallow-fetches
+   the tag named in `ESR_VERSION` and runs `scripts/apply.sh`. That puts
+   Goat's patches on a local branch `goat` in `engine/`, copies
+   `branding/goat` into it, and copies `mozconfig` to `engine/mozconfig`,
+   where mach finds it by itself, so `./mach build` picks up Goat's options
+   in any shell. Rerun `scripts/apply.sh` after changing anything in this
+   repo; with nothing changed it touches no files.
 
 On the first machine, bootstrap took about 12 minutes and the first
 unmodified build took about 69 minutes (4155 s). The first Goat build is
@@ -258,10 +257,15 @@ the old one. Their profile is kept.
    scripts/update-esr.sh 153.6.0esr
    ```
 
-   This reverts Goat's patches, shallow-fetches the
-   `FIREFOX_<ver>esr_RELEASE` tag into `engine/`, dry-runs every patch with
-   `git apply --check` (and stops with a list of conflicting patches if any
-   fail), re-applies the overlay and updates `ESR_VERSION`.
+   This shallow-fetches the `FIREFOX_<ver>esr_RELEASE` tag into `engine/`
+   and rebases the `goat` branch onto it
+   (`git rebase --onto <new tag> <old commit> goat`). If a patch conflicts,
+   the rebase stops and `ESR_VERSION` is left alone. Either resolve the
+   conflicts, `git -C engine add` the files, run
+   `git -C engine rebase --continue` and rerun the same command, or run
+   `git -C engine rebase --abort` to get the old `goat` branch back
+   untouched. On success it re-exports `patches/` with `git format-patch`,
+   updates `ESR_VERSION` and runs `scripts/apply.sh`.
 3. **Build and package**: `cd engine`,
    `./mach build` and `./mach package`. For a point release an incremental
    build is enough; for a new major ESR run `./mach clobber` first and expect

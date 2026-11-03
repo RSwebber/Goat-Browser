@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:26:10 -0400
+Subject: [PATCH] honour default etp category
+
+
 diff --git a/browser/components/protections/ContentBlockingPrefs.sys.mjs b/browser/components/protections/ContentBlockingPrefs.sys.mjs
-index 4b709b7476..2321208686 100644
+index 4b709b747631e586e5516b06532b20bcdb08effd..23212086863769436c1a81b20661c8be6d4ec719 100644
 --- a/browser/components/protections/ContentBlockingPrefs.sys.mjs
 +++ b/browser/components/protections/ContentBlockingPrefs.sys.mjs
 @@ -518,6 +518,24 @@ export let ContentBlockingPrefs = {

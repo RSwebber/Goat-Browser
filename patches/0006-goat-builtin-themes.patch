@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:57:03 -0400
+Subject: [PATCH] goat builtin themes
+
+
 diff --git a/browser/themes/BuiltInThemeConfig.sys.mjs b/browser/themes/BuiltInThemeConfig.sys.mjs
-index efe786548a..ef18eed17f 100644
+index efe786548af7063d071789dbbe7557bd47519896..ef18eed17fc72dd9e75248bd656ede139261db74 100644
 --- a/browser/themes/BuiltInThemeConfig.sys.mjs
 +++ b/browser/themes/BuiltInThemeConfig.sys.mjs
 @@ -46,4 +46,19 @@ export const BuiltInThemeConfig = new Map([
@@ -23,7 +29,7 @@ index efe786548a..ef18eed17f 100644
 +  ],
  ]);
 diff --git a/browser/themes/BuiltInThemes.sys.mjs b/browser/themes/BuiltInThemes.sys.mjs
-index ffad3aa4c7..e708694335 100644
+index ffad3aa4c7d5d78549dbde3effe69b15cbd1f6b2..e708694335f7a3189a80ac6aed39fe41813be054 100644
 --- a/browser/themes/BuiltInThemes.sys.mjs
 +++ b/browser/themes/BuiltInThemes.sys.mjs
 @@ -11,6 +11,11 @@ ChromeUtils.defineESModuleGetters(lazy, {

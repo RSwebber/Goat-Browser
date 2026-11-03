@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 12:26:10 -0400
+Subject: [PATCH] set app vendor goat
+
+
 diff --git a/browser/moz.configure b/browser/moz.configure
-index 3ea3d88b93..71aebafbe3 100644
+index 3ea3d88b93604f09067acbc4d26be5e8d4fda91b..71aebafbe3d658f0db134f910dc6c49f8d45e62e 100644
 --- a/browser/moz.configure
 +++ b/browser/moz.configure
 @@ -11,7 +11,7 @@ imply_option("MOZ_NORMANDY", True)

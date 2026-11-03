@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 14:35:39 -0400
+Subject: [PATCH] package distribution dir
+
+
 diff --git a/browser/installer/package-manifest.in b/browser/installer/package-manifest.in
-index 5936f8a8d9..49a0d4303f 100644
+index 5936f8a8d9bd6d57bd0eca31bc32c53eb8c28dcb..49a0d4303f7dba0b4075b4865c14b97e9d522703 100644
 --- a/browser/installer/package-manifest.in
 +++ b/browser/installer/package-manifest.in
 @@ -462,6 +462,5 @@ bin/libfreebl_64int_3.so

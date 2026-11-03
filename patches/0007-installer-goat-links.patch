@@ -1,5 +1,11 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RSwebber <343098333+RSwebber@users.noreply.github.com>
+Date: Mon, 26 Oct 2026 15:11:13 -0400
+Subject: [PATCH] installer goat links
+
+
 diff --git a/browser/installer/windows/nsis/shared.nsh b/browser/installer/windows/nsis/shared.nsh
-index b81c7ef59b..bede9ee427 100755
+index b81c7ef59be0d25f67668215028008a451860df2..bede9ee4276f2e3fadbedacef5665e5d9fdbbcda 100755
 --- a/browser/installer/windows/nsis/shared.nsh
 +++ b/browser/installer/windows/nsis/shared.nsh
 @@ -701,7 +701,7 @@ FunctionEnd
@@ -12,7 +18,7 @@ index b81c7ef59b..bede9ee427 100755
      DeleteRegValue SHCTX "$0" "URLInfoAbout"
  ; Don't add URLUpdateInfo which is the release notes url except for the release
 diff --git a/browser/installer/windows/nsis/uninstaller.nsi b/browser/installer/windows/nsis/uninstaller.nsi
-index becbb0f70c..fb7bfbad53 100755
+index becbb0f70c84eb7f2d9bff5a3aedcbb7a78a61cf..fb7bfbad534b9e01a206645934665437f8961de8 100755
 --- a/browser/installer/windows/nsis/uninstaller.nsi
 +++ b/browser/installer/windows/nsis/uninstaller.nsi
 @@ -150,7 +150,7 @@ OutFile "helper.exe"
@@ -25,7 +31,7 @@ index becbb0f70c..fb7bfbad53 100755
  ; Support for the profile refresh feature
  !define URLProfileRefreshHelp "https://support.mozilla.org/kb/refresh-firefox-reset-add-ons-and-settings"
 diff --git a/browser/locales/en-US/installer/custom.properties b/browser/locales/en-US/installer/custom.properties
-index 8c33192e58..71719ac40f 100644
+index 8c33192e589de1d819cbb21c31cec0480ed4c85e..71719ac40fa4815f0e5e631f6e6f23b44b2fb1d4 100644
 --- a/browser/locales/en-US/installer/custom.properties
 +++ b/browser/locales/en-US/installer/custom.properties
 @@ -73,7 +73,7 @@ STATUS_INSTALL_APP=Installing $BrandShortName…
