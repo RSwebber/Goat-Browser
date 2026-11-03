@@ -2,7 +2,7 @@
 
 Goat Browser is a privacy-, security- and customization-focused web browser
 built as a fork of **Firefox ESR**. The current base is Firefox
-**153.5.1esr** (see [`ESR_VERSION`](ESR_VERSION)).
+**153.6.0esr** (see [`ESR_VERSION`](ESR_VERSION)).
 
 > Status: step 4. Goat branding, privacy defaults, policies, uBlock
 > Origin (installed by policy), Goat themes and a Goat settings pane are applied on top of upstream
