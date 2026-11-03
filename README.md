@@ -84,8 +84,8 @@ goat/
     language models are downloaded from Mozilla, once per language). Toggles
     for page translation, offering to translate automatically and
     translating selected text, a button for `about:translations` (paste or
-    type text), and upstream's dialog for always/never-translate languages
-    and model downloads. English is the default target language.
+    type text), and upstream's Translations settings page for
+    always/never-translate languages and model downloads. English is the default target language.
   - Keyboard shortcuts: a link to Firefox's built-in editor, `about:keyboard`.
 - **Themes**: Goat Dark (the default on new profiles) and Goat Light are
   built-in themes and appear in Add-ons → Themes.

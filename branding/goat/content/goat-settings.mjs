@@ -131,7 +131,7 @@ Preferences.addSetting({
 // --- Translator --------------------------------------------------------------
 // Firefox Translations: translation runs on this device, and only the language
 // models are downloaded. The language and download lists are upstream's
-// translations dialog, which the stock General pane also opens.
+// Translations settings subpage.
 
 Preferences.addSetting({
   id: "goat-translate-pages",
@@ -167,9 +167,9 @@ Preferences.addSetting({
   disabled: ({ "goat-translate-pages": pages }) => !pages.value,
   onUserClick(e) {
     e.preventDefault();
-    window.gSubDialog.open(
-      "chrome://browser/content/preferences/dialogs/translations.xhtml"
-    );
+    // Upstream's Translations subpage (always/never lists and model
+    // downloads), turned on by browser.settings-redesign.translations.enabled.
+    window.gotoPref("paneTranslations");
   },
 });
 
