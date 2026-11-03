@@ -74,6 +74,9 @@ pref("browser.translations.enable", true);
 pref("browser.translations.select.enable", true);
 pref("browser.translations.automaticallyPopup", true);
 pref("browser.translations.mostRecentTargetLanguages", "en");
+// Upstream's Translations settings subpage, which has the always/never-translate
+// lists and the language model downloads. The Goat pane links to it.
+pref("browser.settings-redesign.translations.enabled", true);
 
 // --- Default-browser prompt --------------------------------------------------
 pref("browser.shell.checkDefaultBrowser", false);
