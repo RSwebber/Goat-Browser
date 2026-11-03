@@ -4,9 +4,9 @@
 #
 #   scripts/check-esr.sh
 #
-# Prints the result. Exit code: 0 = up to date, 10 = update available,
-# 1 = error. With GITHUB_OUTPUT set (in GitHub Actions), also writes
-# current=, latest= and update= outputs.
+# Prints the result. Exit code: 0 = the check ran (whether or not an update
+# is available), 1 = error. With GITHUB_OUTPUT set (in GitHub Actions), also
+# writes current=, latest= and update= outputs.
 
 set -euo pipefail
 
@@ -16,7 +16,7 @@ URL="https://product-details.mozilla.org/1.0/firefox_versions.json"
 current="$(head -n 1 "$GOAT/ESR_VERSION" | tr -d '[:space:]')"
 latest="$(curl -fsSL "$URL" |
   sed -n 's/.*"FIREFOX_ESR"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' |
-  head -n 1)"
+  head -n 1)" || latest=""
 
 if [ -z "$latest" ]; then
   echo "check-esr: could not read FIREFOX_ESR from $URL" >&2
@@ -39,6 +39,3 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
     echo "update=$update"
   } >> "$GITHUB_OUTPUT"
 fi
-
-[ "$update" = true ] && exit 10
-exit 0
