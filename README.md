@@ -4,8 +4,8 @@ Goat Browser is a privacy-, security- and customization-focused web browser
 built as a fork of **Firefox ESR**. The current base is Firefox
 **153.5.1esr** (see [`ESR_VERSION`](ESR_VERSION)).
 
-> Status: step 4. Goat branding, privacy defaults, policies, a bundled uBlock
-> Origin, Goat themes and a Goat settings pane are applied on top of upstream
+> Status: step 4. Goat branding, privacy defaults, policies, uBlock
+> Origin (installed by policy), Goat themes and a Goat settings pane are applied on top of upstream
 > Firefox ESR. There's a Windows installer and a routine for updating to new
 > ESR releases.
 
@@ -28,8 +28,7 @@ goat/
 │       ├── locales/en-US/goat.ftl     Goat UI strings
 │       └── distribution/
 │           ├── policies.json          enterprise policies -> dist/bin/distribution/
-│           ├── extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
-│           └── moz.build              installs the two above during the build
+│           └── moz.build              installs policies.json during the build
 ├── patches/               source patches against engine/ (git format-patch queue)
 ├── scripts/
 │   ├── apply.sh           builds branch goat in engine/, stages the overlay and mozconfig
@@ -64,8 +63,9 @@ goat/
   `about:config`.
 - **Policies** (`branding/goat/distribution/policies.json`): DisableTelemetry,
   DisableFirefoxStudies, DisablePocket, DuckDuckGo as the default search
-  engine, uBlock Origin installed as `normal_installed` (the user can
-  disable it, but it is reinstalled if removed), and UserMessaging to hide
+  engine, uBlock Origin installed from addons.mozilla.org as
+  `normal_installed` on first start (the user can disable it, but it is
+  reinstalled if removed; it then updates itself from AMO), and UserMessaging to hide
   the Firefox Labs and More from Mozilla settings pages.
 - **Goat settings pane** (`about:preferences#goat`): every control is bound
   to a real pref, so everything is reversible in `about:config`.
@@ -104,7 +104,7 @@ goat/
     features, and the uninstaller's feedback checkbox opens a GitHub issue
     instead of Mozilla's survey.
   - `0008-package-distribution-dir.patch`: always packages `distribution/`
-    (policies and uBlock Origin).
+    (policies).
 
 ### Known leftovers
 
@@ -163,14 +163,6 @@ python -m venv .venv-tools
 .venv-tools/Scripts/python scripts/make_branding.py
 ```
 
-### Updating uBlock Origin
-
-Download the latest signed `.xpi` from addons.mozilla.org
-(<https://addons.mozilla.org/firefox/addon/ublock-origin/>), replace
-`branding/goat/distribution/extensions/uBlock0@raymondhill.net.xpi`, and check its
-SHA-256 against the hash published by the AMO API. The policy's `install_url`
-also points at AMO's latest version, so a removed copy is reinstalled online.
-
 ### Packaging and the Windows installer
 
 ```bash
@@ -185,8 +177,7 @@ with MozillaBuild):
 - `engine/obj-x86_64-pc-windows-msvc/dist/goat-<ver>.en-US.win64.installer.exe`
 - `engine/obj-x86_64-pc-windows-msvc/dist/goat-<ver>.en-US.win64.zip`
 
-`policies.json` and the bundled uBlock Origin `.xpi` are installed by the
-build into `dist/bin/distribution/`. Upstream only packages that folder for
+`policies.json` is installed by the build into `dist/bin/distribution/`. Upstream only packages that folder for
 Mozilla's own builds, so `patches/0008` ships it unconditionally. Check
 each new package:
 
@@ -194,8 +185,7 @@ each new package:
 ~/.mozbuild/7zz/7zz.exe l dist/goat-*.installer.exe | grep -E 'distribution|\.exe$'
 ```
 
-It should list `core\distribution\policies.json` and
-`core\distribution\extensions\uBlock0@raymondhill.net.xpi`, plus `goat.exe`,
+It should list `core\distribution\policies.json` and `goat.exe`, no `.xpi`,
 and no `firefox.exe`, `updater.exe`, `crashreporter.exe` or maintenance
 service. (`pingsender.exe` is included but only runs when telemetry sends a
 ping, and telemetry is off.)
@@ -277,6 +267,6 @@ the old one. Their profile is kept.
 ## License
 
 Goat Browser is licensed under the [Mozilla Public License 2.0](LICENSE), the
-same license as the Firefox source it is based on. uBlock Origin is GPLv3 and
-is redistributed unmodified. "Firefox" is a Mozilla trademark, and Goat
+same license as the Firefox source it is based on. uBlock Origin is GPLv3; Goat
+doesn't ship it, the policy installs it from addons.mozilla.org. "Firefox" is a Mozilla trademark, and Goat
 Browser is not affiliated with or endorsed by Mozilla.

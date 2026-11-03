@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# Installs Goat's enterprise policies and bundled add-ons into
+# Installs Goat's enterprise policies (policies.json) into
 # dist/bin/distribution/. Upstream's package-manifest only ships that folder
 # for Mozilla's own builds, so patches/0008 packages it unconditionally.
 
@@ -10,8 +10,4 @@ DIST_SUBDIR = ""
 
 FINAL_TARGET_FILES.distribution += [
     "policies.json",
-]
-
-FINAL_TARGET_FILES.distribution.extensions += [
-    "extensions/uBlock0@raymondhill.net.xpi",
 ]

@@ -5,7 +5,7 @@ Subject: [PATCH] package distribution dir
 
 
 diff --git a/browser/installer/package-manifest.in b/browser/installer/package-manifest.in
-index 5936f8a8d9bd6d57bd0eca31bc32c53eb8c28dcb..49a0d4303f7dba0b4075b4865c14b97e9d522703 100644
+index 5936f8a8d9bd6d57bd0eca31bc32c53eb8c28dcb..79690ad960be1135b3265003633615ad759ce583 100644
 --- a/browser/installer/package-manifest.in
 +++ b/browser/installer/package-manifest.in
 @@ -462,6 +462,5 @@ bin/libfreebl_64int_3.so
@@ -13,6 +13,6 @@ index 5936f8a8d9bd6d57bd0eca31bc32c53eb8c28dcb..49a0d4303f7dba0b4075b4865c14b97e
  #endif
  
 -#if defined(BUILT_BY_MOZILLA)
-+; Goat: always ship distribution/ (enterprise policies and bundled add-ons).
++; Goat: always ship distribution/ (enterprise policies).
  @RESPATH@/distribution/*
 -#endif
