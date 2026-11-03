@@ -5,10 +5,10 @@ Subject: [PATCH] honour default etp category
 
 
 diff --git a/browser/components/protections/ContentBlockingPrefs.sys.mjs b/browser/components/protections/ContentBlockingPrefs.sys.mjs
-index 4b709b747631e586e5516b06532b20bcdb08effd..23212086863769436c1a81b20661c8be6d4ec719 100644
+index 4b709b747631e586e5516b06532b20bcdb08effd..4fd073826d9c8adc4da7d1be28444ea3c6fdd8a7 100644
 --- a/browser/components/protections/ContentBlockingPrefs.sys.mjs
 +++ b/browser/components/protections/ContentBlockingPrefs.sys.mjs
-@@ -518,6 +518,24 @@ export let ContentBlockingPrefs = {
+@@ -518,6 +518,27 @@ export let ContentBlockingPrefs = {
  
    init() {
      this.setPrefExpectationsAndUpdate();
@@ -26,8 +26,11 @@ index 4b709b747631e586e5516b06532b20bcdb08effd..23212086863769436c1a81b20661c8be
 +        .getStringPref(this.PREF_CB_CATEGORY, "standard");
 +      if (builtIn in this.CATEGORY_PREFS && builtIn != "standard") {
 +        this.switchingCategory = true;
-+        this.setPrefsToCategory(builtIn, false, true);
-+        this.switchingCategory = false;
++        try {
++          this.setPrefsToCategory(builtIn, false, true);
++        } finally {
++          this.switchingCategory = false;
++        }
 +      }
 +    }
      this.matchCBCategory();
