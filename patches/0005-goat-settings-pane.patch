@@ -8,7 +8,7 @@ diff --git a/browser/components/preferences/preferences.js b/browser/components/
 index c76a0647e14bac806d9428483bb565b3e10c31e7..89edc898cad64747fcb55761047495290e969f88 100644
 --- a/browser/components/preferences/preferences.js
 +++ b/browser/components/preferences/preferences.js
-@@ -301,6 +301,17 @@ const CONFIG_PANES = Object.freeze({
+@@ -301,6 +301,18 @@ const CONFIG_PANES = Object.freeze({
      groupIds: ["firefoxLabsFeatures"],
      module: "chrome://browser/content/preferences/config/firefoxLabs.mjs",
    },
@@ -19,6 +19,7 @@ index c76a0647e14bac806d9428483bb565b3e10c31e7..89edc898cad64747fcb5576104749529
 +      "goatAppearance",
 +      "goatPrivacyLevel",
 +      "goatPrivacyToggles",
++      "goatTranslator",
 +      "goatShortcuts",
 +    ],
 +    module: "chrome://branding/content/goat-settings.mjs",

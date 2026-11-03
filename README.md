@@ -80,6 +80,12 @@ goat/
     and clear cookies and site data on close (history is not cleared). Both
     are the Privacy pane's own settings, shown with Goat's labels. Plus a
     button for the uBlock Origin dashboard.
+  - Translator: Firefox Translations, which runs on the device (only the
+    language models are downloaded from Mozilla, once per language). Toggles
+    for page translation, offering to translate automatically and
+    translating selected text, a button for `about:translations` (paste or
+    type text), and upstream's dialog for always/never-translate languages
+    and model downloads. English is the default target language.
   - Keyboard shortcuts: a link to Firefox's built-in editor, `about:keyboard`.
 - **Themes**: Goat Dark (the default on new profiles) and Goat Light are
   built-in themes and appear in Add-ons → Themes.

@@ -65,5 +65,15 @@ pref("browser.discovery.enabled", false);
 pref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons", false);
 pref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features", false);
 
+// --- Translator --------------------------------------------------------------
+// Firefox Translations runs on the device; only the language models are
+// downloaded (once per language, from Mozilla's Remote Settings). Goat
+// translates into English by default and offers to translate any page that
+// isn't in English. Edited from the Goat settings pane.
+pref("browser.translations.enable", true);
+pref("browser.translations.select.enable", true);
+pref("browser.translations.automaticallyPopup", true);
+pref("browser.translations.mostRecentTargetLanguages", "en");
+
 // --- Default-browser prompt --------------------------------------------------
 pref("browser.shell.checkDefaultBrowser", false);

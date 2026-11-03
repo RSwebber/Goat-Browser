@@ -38,6 +38,9 @@ pref("browser.compactmode.show", "bool");
 pref("browser.toolbars.bookmarks.visibility", "string");
 pref("privacy.resistFingerprinting", "bool");
 pref("privacy.resistFingerprinting.exemptedDomains", "string");
+pref("browser.translations.enable", "bool");
+pref("browser.translations.automaticallyPopup", "bool");
+pref("browser.translations.select.enable", "bool");
 
 function topWindow() {
   return window.browsingContext.topChromeWindow;
@@ -122,6 +125,51 @@ Preferences.addSetting({
     if (policy) {
       topWindow().openTrustedLinkIn(policy.getURL("dashboard.html"), "tab");
     }
+  },
+});
+
+// --- Translator --------------------------------------------------------------
+// Firefox Translations: translation runs on this device, and only the language
+// models are downloaded. The language and download lists are upstream's
+// translations dialog, which the stock General pane also opens.
+
+Preferences.addSetting({
+  id: "goat-translate-pages",
+  pref: "browser.translations.enable",
+});
+
+Preferences.addSetting({
+  id: "goat-translate-offer",
+  pref: "browser.translations.automaticallyPopup",
+  deps: ["goat-translate-pages"],
+  disabled: ({ "goat-translate-pages": pages }) => !pages.value,
+});
+
+Preferences.addSetting({
+  id: "goat-translate-selection",
+  pref: "browser.translations.select.enable",
+});
+
+Preferences.addSetting({
+  id: "goat-translate-text",
+  deps: ["goat-translate-pages"],
+  // about:translations is only available while Translations is enabled.
+  disabled: ({ "goat-translate-pages": pages }) => !pages.value,
+  onUserClick(e) {
+    e.preventDefault();
+    topWindow().openTrustedLinkIn("about:translations", "tab");
+  },
+});
+
+Preferences.addSetting({
+  id: "goat-translate-languages",
+  deps: ["goat-translate-pages"],
+  disabled: ({ "goat-translate-pages": pages }) => !pages.value,
+  onUserClick(e) {
+    e.preventDefault();
+    window.gSubDialog.open(
+      "chrome://browser/content/preferences/dialogs/translations.xhtml"
+    );
   },
 });
 
@@ -212,6 +260,30 @@ SettingGroupManager.registerGroups({
       {
         id: "goat-ublock-dashboard",
         l10nId: "goat-ublock-dashboard",
+        control: "moz-box-button",
+      },
+    ],
+  },
+  goatTranslator: {
+    l10nId: "goat-translator-group",
+    iconSrc: "chrome://browser/skin/translations.svg",
+    headingLevel: 2,
+    items: [
+      { id: "goat-translate-pages", l10nId: "goat-translate-pages", control: "moz-toggle" },
+      { id: "goat-translate-offer", l10nId: "goat-translate-offer", control: "moz-toggle" },
+      {
+        id: "goat-translate-selection",
+        l10nId: "goat-translate-selection",
+        control: "moz-toggle",
+      },
+      {
+        id: "goat-translate-text",
+        l10nId: "goat-translate-text",
+        control: "moz-box-button",
+      },
+      {
+        id: "goat-translate-languages",
+        l10nId: "goat-translate-languages",
         control: "moz-box-button",
       },
     ],
