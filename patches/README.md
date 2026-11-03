@@ -1,6 +1,6 @@
 # patches/
 
-Future source patches against `engine/` (upstream Firefox ESR) go here as
+Goat's source patches against `engine/` (upstream Firefox ESR) live here as
 `*.patch` files in `git diff` format, named with a numeric prefix so they apply
 in order (e.g. `0001-something.patch`).
 

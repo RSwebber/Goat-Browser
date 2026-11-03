@@ -29,7 +29,7 @@ cp "$GOAT/settings/moz.build" "$BRAND_DST/distribution/moz.build"
 cp "$GOAT/settings/policies.json" "$BRAND_DST/distribution/policies.json"
 cp "$GOAT/settings/distribution/extensions/"*.xpi "$BRAND_DST/distribution/extensions/"
 
-# Source patches (none yet). Each is applied only if not already applied.
+# Source patches, in order. Each is applied only if not already applied.
 for p in "$GOAT"/patches/*.patch; do
   [ -e "$p" ] || continue
   if git -C "$ENGINE" apply --check --reverse "$p" 2>/dev/null; then
