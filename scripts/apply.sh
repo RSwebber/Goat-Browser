@@ -69,7 +69,7 @@ if [ "${1:-}" = --adopt ]; then
 elif [ "$branch" = goat ] && [ "$want" = "$(sed -n 1p "$STAMP" 2>/dev/null)" ]; then
   echo "apply.sh: branch goat is up to date (${#patches[@]} patches)"
 else
-  built="$(sed -n 2p "$STAMP" 2>/dev/null)"
+  built="$(sed -n 2p "$STAMP" 2>/dev/null || true)"
   if [ -n "$old" ] && [ -n "$built" ] && [ "$old" != "$built" ]; then
     die "branch goat has commits that aren't in patches/; export them first
   (scripts/update-esr.sh), or drop them with: git -C engine reset --hard $built"
