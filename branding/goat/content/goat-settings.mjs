@@ -157,7 +157,8 @@ Preferences.addSetting({
   disabled: ({ "goat-translate-pages": pages }) => !pages.value,
   onUserClick(e) {
     e.preventDefault();
-    topWindow().openTrustedLinkIn("about:translations", "tab");
+    // Preselect English; about:translations leaves the target blank otherwise.
+    topWindow().openTrustedLinkIn("about:translations#trg=en", "tab");
   },
 });
 
