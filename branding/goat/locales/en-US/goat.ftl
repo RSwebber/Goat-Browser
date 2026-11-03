@@ -75,6 +75,26 @@ goat-clear-on-close =
 goat-ublock-dashboard =
     .label = Open uBlock Origin dashboard
 
+## Settings: Translator
+
+goat-translator-group =
+    .label = Translator
+    .description = Translates into English on this computer, so the text you translate is never sent to a server. Each language model is downloaded once from Mozilla the first time you use it.
+goat-translate-pages =
+    .label = Translate web pages
+    .description = Shows a translate button in the address bar on pages that aren’t in English.
+goat-translate-offer =
+    .label = Offer to translate automatically
+    .description = Open the translation panel as soon as a page in another language loads.
+goat-translate-selection =
+    .label = Translate selected text
+    .description = Right-click highlighted text and choose Translate Selection.
+goat-translate-text =
+    .label = Translate text you paste or type
+goat-translate-languages =
+    .label = Languages and downloads
+    .description = Pick languages to always or never translate, and download or remove language models.
+
 ## Settings: Keyboard shortcuts
 
 goat-shortcuts-group =
