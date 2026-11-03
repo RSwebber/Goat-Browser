@@ -32,7 +32,7 @@ goat/
 │   └── moz.build          installs the two above during the build
 ├── patches/               source patches against engine/ (git-apply format)
 ├── scripts/
-│   ├── apply.sh           stages the overlay onto engine/ and sets MOZCONFIG
+│   ├── apply.sh           stages the overlay and mozconfig onto engine/
 │   ├── make_branding.py   regenerates all branding images from GOAT.png
 │   └── setup.md           toolchain versions used
 ├── docs/screenshots/      screenshots used in this README
@@ -136,14 +136,15 @@ These are the steps used on the first machine (Windows 11, i7-12700H, 16 GB RAM)
    cd /c/goat/engine
    ./mach --no-interactive bootstrap --application-choice browser   # first time only
    cd /c/goat
-   source scripts/apply.sh          # stage the overlay, export MOZCONFIG
+   scripts/apply.sh                 # stage the overlay and engine/mozconfig
    cd engine
    ./mach build
    ./mach run --temp-profile
    ```
 
-   Always `source scripts/apply.sh` in a new shell before building, so that
-   `MOZCONFIG` points at `C:\goat\mozconfig`.
+   `apply.sh` copies `mozconfig` to `engine/mozconfig`, where mach finds it
+   by itself, so `./mach build` picks up Goat's options in any shell. Rerun
+   `apply.sh` after changing anything in this repo.
 
 On the first machine, bootstrap took about 12 minutes and the first
 unmodified build took about 69 minutes (4155 s). The first Goat build is
@@ -174,7 +175,7 @@ also points at AMO's latest version, so a removed copy is reinstalled online.
 ### Packaging and the Windows installer
 
 ```bash
-cd /c/goat && source scripts/apply.sh
+cd /c/goat && scripts/apply.sh
 cd engine
 ./mach package
 ```
@@ -261,7 +262,7 @@ the old one. Their profile is kept.
    `FIREFOX_<ver>esr_RELEASE` tag into `engine/`, dry-runs every patch with
    `git apply --check` (and stops with a list of conflicting patches if any
    fail), re-applies the overlay and updates `ESR_VERSION`.
-3. **Build and package**: `source scripts/apply.sh`, then `cd engine`,
+3. **Build and package**: `cd engine`,
    `./mach build` and `./mach package`. For a point release an incremental
    build is enough; for a new major ESR run `./mach clobber` first and expect
    to rework some patches.

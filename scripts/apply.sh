@@ -1,13 +1,13 @@
 #!/bin/bash
 # Apply Goat Browser's overlay onto the upstream engine/ checkout.
 #
-# Run from the MozillaBuild shell. Safe to run repeatedly: staged files are
-# replaced wholesale on every run.
+#   scripts/apply.sh
 #
-#   source scripts/apply.sh   # also exports MOZCONFIG into your shell
-#   ./scripts/apply.sh        # stage files only (then export MOZCONFIG yourself)
+# Run from the MozillaBuild shell. Safe to run repeatedly: staged files are
+# replaced wholesale on every run. The mozconfig is copied to engine/mozconfig,
+# where mach finds it by itself, so nothing needs to be exported.
 
-set -e
+set -euo pipefail
 
 GOAT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENGINE="$GOAT/engine"
@@ -15,7 +15,7 @@ BRAND_DST="$ENGINE/browser/branding/goat"
 
 if [ ! -f "$ENGINE/mach" ]; then
   echo "apply.sh: no Firefox checkout at $ENGINE (see README)" >&2
-  return 1 2>/dev/null || exit 1
+  exit 1
 fi
 
 # Branding: replace the staged copy so removed files don't linger.
@@ -40,6 +40,9 @@ for p in "$GOAT"/patches/*.patch; do
   fi
 done
 
-export MOZCONFIG="$GOAT/mozconfig"
+# mach uses topsrcdir/mozconfig when MOZCONFIG is unset. Copy only on change,
+# so an unchanged mozconfig doesn't trigger a reconfigure.
+cmp -s "$GOAT/mozconfig" "$ENGINE/mozconfig" || cp "$GOAT/mozconfig" "$ENGINE/mozconfig"
+
 echo "apply.sh: overlay staged in $BRAND_DST"
-echo "apply.sh: MOZCONFIG=$MOZCONFIG"
+echo "apply.sh: mozconfig staged as $ENGINE/mozconfig"

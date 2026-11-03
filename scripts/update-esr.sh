@@ -101,8 +101,7 @@ echo "update-esr: ESR_VERSION updated to $version ($commit)"
 cat <<EOF
 
 Next, from the MozillaBuild shell:
-  cd $GOAT && source scripts/apply.sh
-  cd engine
+  cd $GOAT/engine
   ./mach build                  # incremental; ./mach clobber first for a major ESR
   ./mach package                # also builds the installer
 The installer is engine/obj-x86_64-pc-windows-msvc/dist/goat-<ver>.en-US.win64.installer.exe.

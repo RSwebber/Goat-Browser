@@ -1,5 +1,6 @@
 # Goat Browser build configuration.
-# scripts/apply.sh points MOZCONFIG at this file.
+# scripts/apply.sh copies this file to engine/mozconfig, where mach finds it
+# when MOZCONFIG is unset.
 # Optimized, non-debug build (the defaults).
 
 ac_add_options --with-branding=browser/branding/goat
