@@ -18,16 +18,10 @@ if [ ! -f "$ENGINE/mach" ]; then
   exit 1
 fi
 
-# Branding: replace the staged copy so removed files don't linger.
+# Branding, including distribution/ (policies + bundled add-ons): replace the
+# staged copy so removed files don't linger.
 rm -rf "$BRAND_DST"
 cp -r "$GOAT/branding/goat" "$BRAND_DST"
-
-# Distribution (policies + bundled add-ons), installed by the build into
-# dist/bin/distribution/.
-mkdir -p "$BRAND_DST/distribution/extensions"
-cp "$GOAT/settings/moz.build" "$BRAND_DST/distribution/moz.build"
-cp "$GOAT/settings/policies.json" "$BRAND_DST/distribution/policies.json"
-cp "$GOAT/settings/distribution/extensions/"*.xpi "$BRAND_DST/distribution/extensions/"
 
 # Source patches, in order. Each is applied only if not already applied.
 for p in "$GOAT"/patches/*.patch; do

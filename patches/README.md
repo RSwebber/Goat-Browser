@@ -7,5 +7,5 @@ in order (e.g. `0001-something.patch`).
 `scripts/apply.sh` applies each one with `git apply` and skips any that are
 already applied, so it is safe to rerun.
 
-Prefer prefs (`branding/goat/pref/`) and policies (`settings/`) over source
+Prefer prefs (`branding/goat/pref/`) and policies (`branding/goat/distribution/policies.json`) over source
 patches where possible, because patches have to be rebased on every ESR update.

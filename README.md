@@ -21,15 +21,15 @@ goat/
 ├── branding/
 │   ├── GOAT.png           original logo
 │   ├── goat-logo.png      transparent, square-cropped logo (generated)
-│   └── goat/              branding dir -> engine/browser/branding/goat
+│   └── goat/              branding dir, copied as-is to engine/browser/branding/goat
 │       ├── pref/firefox-branding.js   built-in privacy defaults
 │       ├── content/goat-settings.mjs  the Goat settings pane
 │       ├── content/themes/            Goat Dark and Goat Light themes
-│       └── locales/en-US/goat.ftl     Goat UI strings
-├── settings/
-│   ├── policies.json      enterprise policies -> dist/bin/distribution/
-│   ├── distribution/extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
-│   └── moz.build          installs the two above during the build
+│       ├── locales/en-US/goat.ftl     Goat UI strings
+│       └── distribution/
+│           ├── policies.json          enterprise policies -> dist/bin/distribution/
+│           ├── extensions/uBlock0@raymondhill.net.xpi   signed, from AMO
+│           └── moz.build              installs the two above during the build
 ├── patches/               source patches against engine/ (git-apply format)
 ├── scripts/
 │   ├── apply.sh           stages the overlay and mozconfig onto engine/
@@ -59,7 +59,7 @@ applied onto `engine/` by `scripts/apply.sh`, which is safe to rerun.
   Firefox Suggest, the new-tab weather widget, add-on recommendations and
   discovery off, no default-browser prompt. These are ordinary defaults, so users can change them in
   `about:config`.
-- **Policies** (`settings/policies.json`): DisableTelemetry,
+- **Policies** (`branding/goat/distribution/policies.json`): DisableTelemetry,
   DisableFirefoxStudies, DisablePocket, DuckDuckGo as the default search
   engine, uBlock Origin installed as `normal_installed` (the user can
   disable it, but it is reinstalled if removed), and UserMessaging to hide
@@ -168,7 +168,7 @@ python -m venv .venv-tools
 
 Download the latest signed `.xpi` from addons.mozilla.org
 (<https://addons.mozilla.org/firefox/addon/ublock-origin/>), replace
-`settings/distribution/extensions/uBlock0@raymondhill.net.xpi`, and check its
+`branding/goat/distribution/extensions/uBlock0@raymondhill.net.xpi`, and check its
 SHA-256 against the hash published by the AMO API. The policy's `install_url`
 also points at AMO's latest version, so a removed copy is reinstalled online.
 

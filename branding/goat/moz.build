@@ -4,7 +4,7 @@
 
 DIRS += ["content", "locales"]
 
-# Goat: policies.json + bundled add-ons, staged here by scripts/apply.sh.
+# Goat: policies.json + bundled add-ons.
 DIRS += ["distribution"]
 
 DIST_SUBDIR = "browser"
