@@ -24,6 +24,7 @@ const THEME_DARK = "goat-dark@goat-browser";
 const THEME_LIGHT = "goat-light@goat-browser";
 const THEME_SYSTEM = "default-theme@mozilla.org";
 const UBLOCK_ID = "uBlock0@raymondhill.net";
+const CLAUDE_URL = "https://claude.ai/new";
 
 /** The Preference for `id`, added only if no stock pane has added it. */
 function pref(id, type) {
@@ -38,6 +39,10 @@ pref("browser.compactmode.show", "bool");
 pref("browser.toolbars.bookmarks.visibility", "string");
 pref("privacy.resistFingerprinting", "bool");
 pref("privacy.resistFingerprinting.exemptedDomains", "string");
+pref("browser.ml.chat.enabled", "bool");
+pref("browser.ml.chat.provider", "string");
+pref("browser.ml.chat.shortcuts", "bool");
+pref("browser.ml.chat.page", "bool");
 pref("browser.translations.enable", "bool");
 pref("browser.translations.automaticallyPopup", "bool");
 pref("browser.translations.select.enable", "bool");
@@ -174,6 +179,46 @@ Preferences.addSetting({
   },
 });
 
+// --- Claude ------------------------------------------------------------------
+// Firefox's AI chatbot sidebar with claude.ai as the provider. Claude is an
+// online service: what you send it leaves this device.
+
+Preferences.addSetting({
+  id: "goat-claude-enabled",
+  pref: "browser.ml.chat.enabled",
+  set(enabled) {
+    if (enabled) {
+      // The sidebar and its menus only appear once a provider is chosen.
+      Preferences.get("browser.ml.chat.provider").value = CLAUDE_URL;
+    }
+    return enabled;
+  },
+});
+
+Preferences.addSetting({
+  id: "goat-claude-shortcuts",
+  pref: "browser.ml.chat.shortcuts",
+  deps: ["goat-claude-enabled"],
+  disabled: ({ "goat-claude-enabled": claude }) => !claude.value,
+});
+
+Preferences.addSetting({
+  id: "goat-claude-page",
+  pref: "browser.ml.chat.page",
+  deps: ["goat-claude-enabled"],
+  disabled: ({ "goat-claude-enabled": claude }) => !claude.value,
+});
+
+Preferences.addSetting({
+  id: "goat-claude-open",
+  deps: ["goat-claude-enabled"],
+  disabled: ({ "goat-claude-enabled": claude }) => !claude.value,
+  onUserClick(e) {
+    e.preventDefault();
+    topWindow().SidebarController.show("viewGenaiChatSidebar");
+  },
+});
+
 // --- Keyboard shortcuts ------------------------------------------------------
 
 Preferences.addSetting({
@@ -287,6 +332,17 @@ SettingGroupManager.registerGroups({
         l10nId: "goat-translate-languages",
         control: "moz-box-button",
       },
+    ],
+  },
+  goatClaude: {
+    l10nId: "goat-claude-group",
+    iconSrc: "chrome://browser/content/genai/assets/brands/claude.svg",
+    headingLevel: 2,
+    items: [
+      { id: "goat-claude-enabled", l10nId: "goat-claude-enabled", control: "moz-toggle" },
+      { id: "goat-claude-shortcuts", l10nId: "goat-claude-shortcuts", control: "moz-toggle" },
+      { id: "goat-claude-page", l10nId: "goat-claude-page", control: "moz-toggle" },
+      { id: "goat-claude-open", l10nId: "goat-claude-open", control: "moz-box-button" },
     ],
   },
   goatShortcuts: {

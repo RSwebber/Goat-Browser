@@ -78,5 +78,13 @@ pref("browser.translations.mostRecentTargetLanguages", "en");
 // lists and the language model downloads. The Goat pane links to it.
 pref("browser.settings-redesign.translations.enabled", true);
 
+// --- Claude ------------------------------------------------------------------
+// Firefox's AI chatbot sidebar, with Claude (claude.ai) preselected. Nothing
+// is loaded from or sent to claude.ai until the sidebar is opened or a
+// "Ask Claude" action is used. Edited from the Goat settings pane.
+pref("browser.ml.chat.enabled", true);
+pref("browser.ml.chat.provider", "https://claude.ai/new");
+pref("browser.ml.chat.providers", "claude");
+
 // --- Default-browser prompt --------------------------------------------------
 pref("browser.shell.checkDefaultBrowser", false);

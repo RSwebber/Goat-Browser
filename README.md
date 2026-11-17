@@ -86,6 +86,10 @@ goat/
     translating selected text, a button for `about:translations` (paste or
     type text), and upstream's Translations settings page for
     always/never-translate languages and model downloads. English is the default target language.
+  - Claude: Firefox's AI chatbot sidebar with Claude (claude.ai) preselected
+    as the only listed provider. Toggles for the sidebar, the Ask button on
+    selected text and "Summarize page", and a button to open the sidebar.
+    Claude is an online service; nothing is sent until it is used.
   - Keyboard shortcuts: a link to Firefox's built-in editor, `about:keyboard`.
 - **Themes**: Goat Dark (the default on new profiles) and Goat Light are
   built-in themes and appear in Add-ons → Themes.
