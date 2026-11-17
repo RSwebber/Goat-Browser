@@ -95,6 +95,23 @@ goat-translate-languages =
     .label = Languages and downloads
     .description = Pick languages to always or never translate, and download or remove language models.
 
+## Settings: Claude
+
+goat-claude-group =
+    .label = Claude
+    .description = Chat with Claude in the sidebar. Claude is an online service from Anthropic: you sign in with your Claude account, and anything you send it leaves this computer. Nothing is sent until you open the sidebar or use an Ask Claude action.
+goat-claude-enabled =
+    .label = Claude in the sidebar
+    .description = Adds Claude to the sidebar and the View menu.
+goat-claude-shortcuts =
+    .label = Show Ask Claude when you select text
+    .description = A small button next to highlighted text to summarize, explain or ask about it.
+goat-claude-page =
+    .label = Ask Claude about the page
+    .description = Adds “Summarize page” to the right-click menu and the sidebar. This sends the page’s text to Claude.
+goat-claude-open =
+    .label = Open Claude
+
 ## Settings: Keyboard shortcuts
 
 goat-shortcuts-group =
