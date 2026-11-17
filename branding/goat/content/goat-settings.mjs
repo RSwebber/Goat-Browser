@@ -193,6 +193,16 @@ Preferences.addSetting({
       if (!Services.prefs.getStringPref("browser.ml.chat.provider", "")) {
         Services.prefs.setStringPref("browser.ml.chat.provider", CLAUDE_URL);
       }
+      // Lift a block set in AI controls, so the two pages agree.
+      if (
+        Services.prefs.getStringPref("browser.ai.control.sidebarChatbot", "") ==
+        "blocked"
+      ) {
+        Services.prefs.setStringPref(
+          "browser.ai.control.sidebarChatbot",
+          "enabled"
+        );
+      }
     }
     return enabled;
   },
