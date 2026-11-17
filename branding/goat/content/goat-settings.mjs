@@ -40,7 +40,6 @@ pref("browser.toolbars.bookmarks.visibility", "string");
 pref("privacy.resistFingerprinting", "bool");
 pref("privacy.resistFingerprinting.exemptedDomains", "string");
 pref("browser.ml.chat.enabled", "bool");
-pref("browser.ml.chat.provider", "string");
 pref("browser.ml.chat.shortcuts", "bool");
 pref("browser.ml.chat.page", "bool");
 pref("browser.translations.enable", "bool");
@@ -189,7 +188,11 @@ Preferences.addSetting({
   set(enabled) {
     if (enabled) {
       // The sidebar and its menus only appear once a provider is chosen.
-      Preferences.get("browser.ml.chat.provider").value = CLAUDE_URL;
+      // Set directly: the AI controls pane registers this pref itself when
+      // it loads, and a second registration would throw there.
+      if (!Services.prefs.getStringPref("browser.ml.chat.provider", "")) {
+        Services.prefs.setStringPref("browser.ml.chat.provider", CLAUDE_URL);
+      }
     }
     return enabled;
   },

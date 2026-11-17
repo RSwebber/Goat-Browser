@@ -99,7 +99,7 @@ goat-translate-languages =
 
 goat-claude-group =
     .label = Claude
-    .description = Chat with Claude in the sidebar. Claude is an online service from Anthropic: you sign in with your Claude account, and anything you send it leaves this computer. Nothing is sent until you open the sidebar or use an Ask Claude action.
+    .description = Chat with Claude in the sidebar. Claude is an online service from Anthropic: you sign in with your Claude account, and anything you send it leaves this computer. Nothing is sent until you open the sidebar or use an Ask Claude action. The first time, claude.ai may ask you to confirm you are human.
 goat-claude-enabled =
     .label = Claude in the sidebar
     .description = Adds Claude to the sidebar and the View menu.
